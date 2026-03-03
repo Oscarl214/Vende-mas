@@ -1,0 +1,379 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "back": "Back",
+    "next": "Next",
+    "error": "Error",
+    "ok": "OK",
+    "or": "or",
+    "start": "Get Started"
+  },
+  "auth": {
+    "welcome": {
+      "tagline": "Generate more leads\nfor your business",
+      "taglineSub": "Genera más clientes para tu negocio",
+      "createAccount": "Create Account",
+      "signIn": "Sign In"
+    },
+    "signIn": {
+      "title": "Sign In",
+      "subtitle": "Welcome back",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Your password",
+      "forgotPassword": "Forgot your password?",
+      "submitting": "Signing in...",
+      "submit": "Sign In",
+      "continueGoogle": "Continue with Google",
+      "continuePhone": "Continue with phone",
+      "noAccount": "Don't have an account? ",
+      "createAccount": "Create Account",
+      "forgotPasswordAlert": {
+        "title": "Enter your email",
+        "message": "Enter your email address to reset your password."
+      },
+      "emailSent": {
+        "title": "Email sent",
+        "message": "Check your email to reset your password."
+      },
+      "validation": {
+        "emailInvalid": "Invalid email address",
+        "passwordRequired": "Password is required"
+      }
+    },
+    "signUp": {
+      "title": "Create Account",
+      "subtitle": "Start generating leads for your business",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@email.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Minimum 6 characters",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "Repeat your password",
+      "submitting": "Creating account...",
+      "submit": "Create Account",
+      "continueGoogle": "Continue with Google",
+      "continuePhone": "Continue with phone",
+      "hasAccount": "Already have an account? ",
+      "signIn": "Sign In",
+      "verifyEmail": {
+        "title": "Verify your email",
+        "message": "We sent a verification link to your email."
+      },
+      "validation": {
+        "emailInvalid": "Invalid email address",
+        "passwordMin": "Minimum 6 characters",
+        "passwordMismatch": "Passwords don't match"
+      }
+    },
+    "verifyOtp": {
+      "phoneTitle": "Enter your phone",
+      "otpTitle": "Verify your code",
+      "phoneSubtitle": "We'll send you a code via SMS",
+      "otpSubtitle": "We sent a code to {{phone}}",
+      "phoneLabel": "Phone number",
+      "phonePlaceholder": "+1 (555) 123-4567",
+      "sendingCode": "Sending...",
+      "sendCode": "Send code",
+      "otpLabel": "Verification code",
+      "otpPlaceholder": "000000",
+      "verifying": "Verifying...",
+      "verifyCode": "Verify code",
+      "resendCode": "Resend code",
+      "goBack": "← Go back",
+      "codeResent": {
+        "title": "Code resent",
+        "message": "We sent you a new code via SMS."
+      },
+      "validation": {
+        "phoneInvalid": "Invalid phone number",
+        "codeLength": "Code must be 6 digits"
+      }
+    }
+  },
+  "profile": {
+    "setupTitle": "Set up your business",
+    "editTitle": "Edit business",
+    "steps": {
+      "business": "Your Business",
+      "aiContent": "AI Content",
+      "brand": "Your Brand",
+      "contact": "Contact"
+    },
+    "businessTypes": [
+      "Barber / Hair salon",
+      "Restaurant / Food",
+      "Shop / Retail",
+      "Professional services",
+      "Health & beauty",
+      "Automotive",
+      "Construction",
+      "Cleaning",
+      "Education / Tutoring",
+      "Other"
+    ],
+    "toneOptions": [
+      "Professional",
+      "Friendly",
+      "Casual",
+      "Bold",
+      "Inspirational",
+      "Humorous"
+    ],
+    "languageOptions": {
+      "es": "Spanish",
+      "en": "English"
+    },
+    "colorPalettes": [
+      "Teal & Orange",
+      "Blue & Gold",
+      "Purple & Pink",
+      "Red & Dark",
+      "Green & Lime",
+      "Gray & Cyan"
+    ],
+    "step0": {
+      "title": "Your Business",
+      "subtitle": "Tell us about your business to personalize your experience.",
+      "businessNameLabel": "Business name *",
+      "businessNamePlaceholder": "E.g.: Juan's Barbershop",
+      "businessTypeLabel": "Business type *",
+      "businessTypePlaceholder": "Select a type",
+      "businessTypeSheet": "Business type",
+      "locationLabel": "Location *",
+      "locationPlaceholder": "City, State"
+    },
+    "step1": {
+      "title": "AI Content Profile",
+      "subtitle": "Help us generate the best content for your business.",
+      "servicesLabel": "Services offered *",
+      "servicesPlaceholder": "E.g.: Haircuts, beard trims, fades, hair coloring...",
+      "targetCustomerLabel": "Target customer *",
+      "targetCustomerPlaceholder": "E.g.: Young men ages 18-35 looking for modern styles",
+      "toneLabel": "Content tone *",
+      "tonePlaceholder": "Select a tone",
+      "toneSheet": "Content tone",
+      "languageLabel": "Default content language",
+      "languagePlaceholder": "Select a language",
+      "languageSheet": "Content language"
+    },
+    "step2": {
+      "title": "Your Brand",
+      "subtitle": "Add your logo and choose your brand colors.",
+      "changeLogo": "Change logo",
+      "uploadLogo": "Upload logo",
+      "brandColors": "Brand colors"
+    },
+    "step3": {
+      "title": "Contact",
+      "subtitle": "Information for your clients to contact you (optional).",
+      "phoneLabel": "Contact phone",
+      "phonePlaceholder": "+1 (555) 123-4567",
+      "emailLabel": "Contact email",
+      "emailPlaceholder": "contact@yourbusiness.com",
+      "websiteLabel": "Website",
+      "websitePlaceholder": "www.yourbusiness.com"
+    },
+    "validation": {
+      "businessNameRequired": "Business name is required",
+      "businessTypeRequired": "Business type is required",
+      "locationRequired": "Location is required",
+      "servicesRequired": "Services offered is required",
+      "targetCustomerRequired": "Target customer is required",
+      "toneRequired": "Tone is required",
+      "emailInvalid": "Invalid email"
+    }
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back",
+    "yourBusiness": "Your business",
+    "pro": "PRO",
+    "free": "FREE",
+    "upgradeTitle": "Upgrade to Pro for {{price}}",
+    "upgradeSubtitle": "Unlimited posts, leads and automation",
+    "usageTitle": "Your usage this month",
+    "postsGenerated": "Posts generated",
+    "leadsStored": "Leads stored",
+    "quickActions": "Quick actions",
+    "generatePost": "Generate AI Post",
+    "viewLeads": "View Leads",
+    "summary": "Summary",
+    "newLeads": "New leads",
+    "postsThisMonth": "Posts this month"
+  },
+  "leads": {
+    "stored": "Leads stored",
+    "limitReached": "Lead limit reached",
+    "limitMessage": "Your free plan allows up to {{max}} leads. Upgrade to Pro for {{price}} for unlimited leads.",
+    "viewPlans": "View plans",
+    "emptyTitle": "No leads yet",
+    "emptyMessage": "When your clients fill a form or scan your QR, their data will appear here.",
+    "filterAll": "All",
+    "filterNew": "New",
+    "filterContacted": "Contacted",
+    "filterClosed": "Closed",
+    "statusNew": "New",
+    "statusContacted": "Contacted",
+    "statusClosed": "Closed",
+    "addLead": "Add lead",
+    "addLeadTitle": "New lead",
+    "nameLabel": "Name",
+    "namePlaceholder": "Customer name",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "+1 (555) 123-4567",
+    "shareFormLink": "Share form",
+    "shareFormTitle": "Contact form",
+    "shareFormMessage": "Share this link to receive leads:",
+    "formLinkCopied": "Link copied",
+    "leadCount": "{{count}} leads",
+    "timeAgo": {
+      "now": "now",
+      "minutes": "{{count}}m ago",
+      "hours": "{{count}}h ago",
+      "days": "{{count}}d ago"
+    }
+  },
+  "leadDetail": {
+    "title": "Lead detail",
+    "phoneLabel": "Phone",
+    "emailLabel": "Email",
+    "sourceLabel": "Source",
+    "fromForm": "Public form",
+    "createdLabel": "Date",
+    "status": "Status",
+    "updateStatus": "Update status",
+    "followUp": "AI Follow-Up",
+    "generateFollowUp": "Generate follow-up message",
+    "generating": "Generating...",
+    "followUpResult": "Generated message",
+    "copyMessage": "Copy",
+    "sendWhatsApp": "Send via WhatsApp",
+    "sendSMS": "Send via SMS",
+    "copied": "Copied",
+    "proOnly": "Pro Feature",
+    "proOnlyMessage": "Upgrade to Pro to generate AI follow-up messages.",
+    "upgrade": "View plans",
+    "call": "Call",
+    "sendWith": "Send with",
+    "sendEmail": "Email",
+    "markContactedTitle": "Mark as Contacted?",
+    "markContactedMessage": "Did you reach out to this lead?",
+    "notYet": "Not yet",
+    "yesMarkContacted": "Yes"
+  },
+  "settings": {
+    "editBusiness": "Edit business",
+    "subscription": "Subscription & payments",
+    "notifications": "Notifications",
+    "language": "Language",
+    "signOut": "Sign out",
+    "signOutConfirm": {
+      "title": "Sign out",
+      "message": "Are you sure you want to sign out?",
+      "cancel": "Cancel",
+      "confirm": "Sign out"
+    },
+    "version": "VendeMás v1.0.0",
+    "languagePicker": {
+      "title": "Language",
+      "es": "Español",
+      "en": "English"
+    }
+  },
+  "paywall": {
+    "title": "VendeMás Pro",
+    "alreadyPro": "You're already Pro",
+    "alreadyProDesc": "You have unlimited access to all features.",
+    "goBack": "Go back",
+    "limitMessages": {
+      "posts": "You've reached the free post limit this month.",
+      "leads": "You've reached the lead limit on your free plan.",
+      "default": "Unlock the full power of VendeMás."
+    },
+    "features": {
+      "aiPosts": "AI posts per month",
+      "leads": "Leads stored",
+      "aiFollowUp": "AI follow-up",
+      "smsAutomation": "SMS automation",
+      "advancedAutomation": "Advanced automation",
+      "unlimited": "Unlimited"
+    },
+    "tableHeader": {
+      "feature": "Feature",
+      "free": "Free",
+      "pro": "Pro"
+    },
+    "price": "$39",
+    "pricePerMonth": "/mo",
+    "cancelAnytime": "Cancel anytime",
+    "subscribing": "Processing...",
+    "subscribe": "Subscribe for {{price}}",
+    "restoring": "Restoring...",
+    "restorePurchases": "Restore purchases",
+    "welcomePro": {
+      "title": "Welcome to Pro",
+      "message": "Your subscription is active."
+    },
+    "purchaseError": "Could not complete the purchase.",
+    "restored": {
+      "title": "Purchases restored",
+      "success": "Your Pro plan has been restored.",
+      "notFound": "No previous purchases found.",
+      "error": "Could not restore purchases."
+    }
+  },
+  "contentEngine": {
+    "title": "Generate Post",
+    "goalLabel": "Content goal",
+    "goalPlaceholder": "Select a goal",
+    "goals": {
+      "awareness": "Awareness Post",
+      "promotion": "Promotion",
+      "educational": "Educational Tip",
+      "testimonial": "Testimonial Style",
+      "review_request": "Review Request"
+    },
+    "platformLabel": "Platform",
+    "platformPlaceholder": "Select a platform",
+    "platforms": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "google_business": "Google Business"
+    },
+    "promotionLabel": "What are you promoting?",
+    "promotionPlaceholder": "E.g.: Haircut + beard trim for $15 this week",
+    "generate": "Generate content",
+    "generating": "Generating...",
+    "resultTitle": "Your generated post",
+    "copy": "Copy",
+    "copied": "Copied",
+    "regenerate": "Regenerate",
+    "saveDone": "Save & Done",
+    "saving": "Saving...",
+    "saved": "Post saved",
+    "done": "Done",
+    "leadFormLink": "Your contact link",
+    "leadFormHint": "Include this link in your post to receive leads directly in your app.",
+    "copyWithLink": "Copy post + link",
+    "lengthLabel": "Content length",
+    "lengthAuto": "Auto",
+    "lengthShort": "Short (~100)",
+    "lengthMedium": "Medium (~250)",
+    "lengthLong": "Long (~500)",
+    "limitReached": "Limit reached",
+    "limitMessage": "You've reached the free post limit this month."
+  },
+  "tiers": {
+    "free": "Free",
+    "pro": "Pro",
+    "proPrice": "$39/mo"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "settings": "Settings"
+  }
+}

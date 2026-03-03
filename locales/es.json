@@ -1,0 +1,379 @@
+{
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "Guardando...",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "error": "Error",
+    "ok": "OK",
+    "or": "o",
+    "start": "Comenzar"
+  },
+  "auth": {
+    "welcome": {
+      "tagline": "Genera más clientes\npara tu negocio",
+      "taglineSub": "Generate more leads for your business",
+      "createAccount": "Crear cuenta",
+      "signIn": "Iniciar sesión"
+    },
+    "signIn": {
+      "title": "Iniciar sesión",
+      "subtitle": "Bienvenido de vuelta",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Tu contraseña",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "submitting": "Iniciando sesión...",
+      "submit": "Iniciar sesión",
+      "continueGoogle": "Continuar con Google",
+      "continuePhone": "Continuar con teléfono",
+      "noAccount": "¿No tienes cuenta? ",
+      "createAccount": "Crear cuenta",
+      "forgotPasswordAlert": {
+        "title": "Ingresa tu correo",
+        "message": "Escribe tu correo electrónico para restablecer tu contraseña."
+      },
+      "emailSent": {
+        "title": "Correo enviado",
+        "message": "Revisa tu correo electrónico para restablecer tu contraseña."
+      },
+      "validation": {
+        "emailInvalid": "Correo electrónico inválido",
+        "passwordRequired": "Contraseña requerida"
+      }
+    },
+    "signUp": {
+      "title": "Crear cuenta",
+      "subtitle": "Comienza a generar leads para tu negocio",
+      "emailLabel": "Correo electrónico",
+      "emailPlaceholder": "tu@email.com",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Mínimo 6 caracteres",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Repite tu contraseña",
+      "submitting": "Creando cuenta...",
+      "submit": "Crear cuenta",
+      "continueGoogle": "Continuar con Google",
+      "continuePhone": "Continuar con teléfono",
+      "hasAccount": "¿Ya tienes cuenta? ",
+      "signIn": "Inicia sesión",
+      "verifyEmail": {
+        "title": "Verifica tu correo",
+        "message": "Te enviamos un enlace de verificación a tu correo electrónico."
+      },
+      "validation": {
+        "emailInvalid": "Correo electrónico inválido",
+        "passwordMin": "Mínimo 6 caracteres",
+        "passwordMismatch": "Las contraseñas no coinciden"
+      }
+    },
+    "verifyOtp": {
+      "phoneTitle": "Ingresa tu teléfono",
+      "otpTitle": "Verifica tu código",
+      "phoneSubtitle": "Te enviaremos un código por SMS",
+      "otpSubtitle": "Enviamos un código a {{phone}}",
+      "phoneLabel": "Número de teléfono",
+      "phonePlaceholder": "+1 (555) 123-4567",
+      "sendingCode": "Enviando...",
+      "sendCode": "Enviar código",
+      "otpLabel": "Código de verificación",
+      "otpPlaceholder": "000000",
+      "verifying": "Verificando...",
+      "verifyCode": "Verificar código",
+      "resendCode": "Reenviar código",
+      "goBack": "← Volver",
+      "codeResent": {
+        "title": "Código reenviado",
+        "message": "Te enviamos un nuevo código por SMS."
+      },
+      "validation": {
+        "phoneInvalid": "Número de teléfono inválido",
+        "codeLength": "El código debe ser de 6 dígitos"
+      }
+    }
+  },
+  "profile": {
+    "setupTitle": "Configura tu negocio",
+    "editTitle": "Editar negocio",
+    "steps": {
+      "business": "Tu Negocio",
+      "aiContent": "Contenido AI",
+      "brand": "Tu Marca",
+      "contact": "Contacto"
+    },
+    "businessTypes": [
+      "Barbería / Peluquería",
+      "Restaurante / Comida",
+      "Tienda / Retail",
+      "Servicios profesionales",
+      "Salud y belleza",
+      "Automotriz",
+      "Construcción",
+      "Limpieza",
+      "Educación / Tutoría",
+      "Otro"
+    ],
+    "toneOptions": [
+      "Profesional",
+      "Amigable",
+      "Casual",
+      "Atrevido",
+      "Inspirador",
+      "Humorístico"
+    ],
+    "languageOptions": {
+      "es": "Español",
+      "en": "Inglés"
+    },
+    "colorPalettes": [
+      "Teal y Naranja",
+      "Azul y Dorado",
+      "Púrpura y Rosa",
+      "Rojo y Oscuro",
+      "Verde y Lima",
+      "Gris y Cyan"
+    ],
+    "step0": {
+      "title": "Tu Negocio",
+      "subtitle": "Cuéntanos sobre tu negocio para personalizar tu experiencia.",
+      "businessNameLabel": "Nombre del negocio *",
+      "businessNamePlaceholder": "Ej: Juan's Barbería",
+      "businessTypeLabel": "Tipo de negocio *",
+      "businessTypePlaceholder": "Selecciona un tipo",
+      "businessTypeSheet": "Tipo de negocio",
+      "locationLabel": "Ubicación *",
+      "locationPlaceholder": "Ciudad, Estado"
+    },
+    "step1": {
+      "title": "Perfil de Contenido AI",
+      "subtitle": "Ayúdanos a generar el mejor contenido para tu negocio.",
+      "servicesLabel": "Servicios ofrecidos *",
+      "servicesPlaceholder": "Ej: Cortes de cabello, barba, fades, coloración...",
+      "targetCustomerLabel": "Cliente objetivo *",
+      "targetCustomerPlaceholder": "Ej: Hombres jóvenes de 18-35 años buscando estilos modernos",
+      "toneLabel": "Tono de contenido *",
+      "tonePlaceholder": "Selecciona un tono",
+      "toneSheet": "Tono de contenido",
+      "languageLabel": "Idioma de contenido predeterminado",
+      "languagePlaceholder": "Selecciona un idioma",
+      "languageSheet": "Idioma de contenido"
+    },
+    "step2": {
+      "title": "Tu Marca",
+      "subtitle": "Agrega tu logo y elige los colores de tu marca.",
+      "changeLogo": "Cambiar logo",
+      "uploadLogo": "Subir logo",
+      "brandColors": "Colores de marca"
+    },
+    "step3": {
+      "title": "Contacto",
+      "subtitle": "Información para que tus clientes te contacten (opcional).",
+      "phoneLabel": "Teléfono de contacto",
+      "phonePlaceholder": "+1 (555) 123-4567",
+      "emailLabel": "Correo de contacto",
+      "emailPlaceholder": "contacto@tunegocio.com",
+      "websiteLabel": "Sitio web",
+      "websitePlaceholder": "www.tunegocio.com"
+    },
+    "validation": {
+      "businessNameRequired": "Nombre de negocio requerido",
+      "businessTypeRequired": "Tipo de negocio requerido",
+      "locationRequired": "Ubicación requerida",
+      "servicesRequired": "Servicios ofrecidos es requerido",
+      "targetCustomerRequired": "Cliente objetivo es requerido",
+      "toneRequired": "Tono es requerido",
+      "emailInvalid": "Correo inválido"
+    }
+  },
+  "dashboard": {
+    "welcomeBack": "Bienvenido de vuelta",
+    "yourBusiness": "Tu negocio",
+    "pro": "PRO",
+    "free": "GRATIS",
+    "upgradeTitle": "Pasa a Pro por {{price}}",
+    "upgradeSubtitle": "Posts ilimitados, leads y automatización",
+    "usageTitle": "Tu uso este mes",
+    "postsGenerated": "Posts generados",
+    "leadsStored": "Leads almacenados",
+    "quickActions": "Acciones rápidas",
+    "generatePost": "Generar Post AI",
+    "viewLeads": "Ver Leads",
+    "summary": "Resumen",
+    "newLeads": "Nuevos leads",
+    "postsThisMonth": "Posts este mes"
+  },
+  "leads": {
+    "stored": "Leads almacenados",
+    "limitReached": "Límite de leads alcanzado",
+    "limitMessage": "Tu plan gratis permite hasta {{max}} leads. Pasa a Pro por {{price}} para leads ilimitados.",
+    "viewPlans": "Ver planes",
+    "emptyTitle": "No hay leads todavía",
+    "emptyMessage": "Cuando tus clientes llenen un formulario o escaneen tu QR, sus datos aparecerán aquí.",
+    "filterAll": "Todos",
+    "filterNew": "Nuevos",
+    "filterContacted": "Contactados",
+    "filterClosed": "Cerrados",
+    "statusNew": "Nuevo",
+    "statusContacted": "Contactado",
+    "statusClosed": "Cerrado",
+    "addLead": "Agregar lead",
+    "addLeadTitle": "Nuevo lead",
+    "nameLabel": "Nombre",
+    "namePlaceholder": "Nombre del cliente",
+    "phoneLabel": "Teléfono",
+    "phonePlaceholder": "+1 (555) 123-4567",
+    "shareFormLink": "Compartir formulario",
+    "shareFormTitle": "Formulario de contacto",
+    "shareFormMessage": "Comparte este enlace para recibir leads:",
+    "formLinkCopied": "Enlace copiado",
+    "leadCount": "{{count}} leads",
+    "timeAgo": {
+      "now": "ahora",
+      "minutes": "hace {{count}}m",
+      "hours": "hace {{count}}h",
+      "days": "hace {{count}}d"
+    }
+  },
+  "leadDetail": {
+    "title": "Detalle del lead",
+    "phoneLabel": "Teléfono",
+    "emailLabel": "Correo",
+    "sourceLabel": "Fuente",
+    "fromForm": "Formulario público",
+    "createdLabel": "Fecha",
+    "status": "Estado",
+    "updateStatus": "Actualizar estado",
+    "followUp": "Seguimiento AI",
+    "generateFollowUp": "Generar mensaje de seguimiento",
+    "generating": "Generando...",
+    "followUpResult": "Mensaje generado",
+    "copyMessage": "Copiar",
+    "sendWhatsApp": "Enviar por WhatsApp",
+    "sendSMS": "Enviar por SMS",
+    "copied": "Copiado",
+    "proOnly": "Función Pro",
+    "proOnlyMessage": "Actualiza a Pro para generar mensajes de seguimiento con AI.",
+    "upgrade": "Ver planes",
+    "call": "Llamar",
+    "sendWith": "Enviar con",
+    "sendEmail": "Email",
+    "markContactedTitle": "¿Marcar como Contactado?",
+    "markContactedMessage": "¿Contactaste a este lead?",
+    "notYet": "Aún no",
+    "yesMarkContacted": "Sí"
+  },
+  "settings": {
+    "editBusiness": "Editar negocio",
+    "subscription": "Suscripción y pagos",
+    "notifications": "Notificaciones",
+    "language": "Idioma",
+    "signOut": "Cerrar sesión",
+    "signOutConfirm": {
+      "title": "Cerrar sesión",
+      "message": "¿Estás seguro que deseas cerrar sesión?",
+      "cancel": "Cancelar",
+      "confirm": "Cerrar sesión"
+    },
+    "version": "VendeMás v1.0.0",
+    "languagePicker": {
+      "title": "Idioma",
+      "es": "Español",
+      "en": "English"
+    }
+  },
+  "paywall": {
+    "title": "VendeMás Pro",
+    "alreadyPro": "Ya eres Pro",
+    "alreadyProDesc": "Tienes acceso ilimitado a todas las funciones.",
+    "goBack": "Volver",
+    "limitMessages": {
+      "posts": "Llegaste al límite de posts gratis este mes.",
+      "leads": "Llegaste al límite de leads en tu plan gratis.",
+      "default": "Desbloquea todo el poder de VendeMás."
+    },
+    "features": {
+      "aiPosts": "Posts con AI por mes",
+      "leads": "Leads almacenados",
+      "aiFollowUp": "Seguimiento AI",
+      "smsAutomation": "Automatización SMS",
+      "advancedAutomation": "Automatización avanzada",
+      "unlimited": "Ilimitados"
+    },
+    "tableHeader": {
+      "feature": "Función",
+      "free": "Gratis",
+      "pro": "Pro"
+    },
+    "price": "$39",
+    "pricePerMonth": "/mes",
+    "cancelAnytime": "Cancela cuando quieras",
+    "subscribing": "Procesando...",
+    "subscribe": "Suscribirse por {{price}}",
+    "restoring": "Restaurando...",
+    "restorePurchases": "Restaurar compras",
+    "welcomePro": {
+      "title": "Bienvenido a Pro",
+      "message": "Tu suscripción está activa."
+    },
+    "purchaseError": "No se pudo completar la compra.",
+    "restored": {
+      "title": "Compras restauradas",
+      "success": "Tu plan Pro ha sido restaurado.",
+      "notFound": "No se encontraron compras anteriores.",
+      "error": "No se pudieron restaurar las compras."
+    }
+  },
+  "contentEngine": {
+    "title": "Generar Post",
+    "goalLabel": "Objetivo del contenido",
+    "goalPlaceholder": "Selecciona un objetivo",
+    "goals": {
+      "awareness": "Post de visibilidad",
+      "promotion": "Promoción",
+      "educational": "Tip educativo",
+      "testimonial": "Estilo testimonio",
+      "review_request": "Pedir reseña"
+    },
+    "platformLabel": "Plataforma",
+    "platformPlaceholder": "Selecciona una plataforma",
+    "platforms": {
+      "facebook": "Facebook",
+      "instagram": "Instagram",
+      "google_business": "Google Business"
+    },
+    "promotionLabel": "¿Qué estás promocionando?",
+    "promotionPlaceholder": "Ej: Corte de cabello + barba por $15 esta semana",
+    "generate": "Generar contenido",
+    "generating": "Generando...",
+    "resultTitle": "Tu post generado",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "regenerate": "Regenerar",
+    "saveDone": "Guardar y listo",
+    "saving": "Guardando...",
+    "saved": "Post guardado",
+    "done": "Listo",
+    "leadFormLink": "Tu enlace de contacto",
+    "leadFormHint": "Incluye este enlace en tu post para recibir leads directamente en tu app.",
+    "copyWithLink": "Copiar post + enlace",
+    "lengthLabel": "Largo del contenido",
+    "lengthAuto": "Auto",
+    "lengthShort": "Corto (~100)",
+    "lengthMedium": "Medio (~250)",
+    "lengthLong": "Largo (~500)",
+    "limitReached": "Límite alcanzado",
+    "limitMessage": "Llegaste al límite de posts gratis este mes."
+  },
+  "tiers": {
+    "free": "Gratis",
+    "pro": "Pro",
+    "proPrice": "$39/mes"
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "settings": "Ajustes"
+  }
+}
