@@ -21,9 +21,12 @@ import { supabase } from '@/lib/supabase';
 import {
   getLeads,
   createLead,
+  leadNeedsFollowUp,
+  daysSince,
   type Lead,
   type LeadStatus,
 } from '@/lib/leads';
+import { getEffectiveBookingUrl } from '@/lib/booking';
 
 const STATUS_COLORS: Record<LeadStatus, string> = {
   new: '#16A34A',
@@ -31,7 +34,7 @@ const STATUS_COLORS: Record<LeadStatus, string> = {
   closed: '#6B7280',
 };
 
-type FilterKey = 'all' | LeadStatus;
+type FilterKey = 'all' | LeadStatus | 'needsFollowUp';
 
 function timeAgo(
   dateStr: string,
@@ -66,11 +69,8 @@ export default function LeadsScreen() {
   const [newPhone, setNewPhone] = useState('');
   const [addingLead, setAddingLead] = useState(false);
 
-  const formBase = process.env.EXPO_PUBLIC_FORM_URL ?? '';
-  const apiBase = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
-  const biz = encodeURIComponent(profile?.business_name ?? '');
   const formUrl = user
-    ? `${formBase}?user_id=${user.id}&business=${biz}&api=${encodeURIComponent(apiBase)}`
+    ? getEffectiveBookingUrl(profile ?? null, user.id)
     : '';
 
   const fetchLeads = useCallback(async () => {
@@ -137,10 +137,20 @@ export default function LeadsScreen() {
     };
   }, [user, refreshUsage]);
 
+  const leadsNeedingFollowUp = useMemo(
+    () => leads.filter(leadNeedsFollowUp),
+    [leads],
+  );
+  /** Set to true to show follow-up UI regardless of tier (for testing). */
+  const DEBUG_SHOW_FOLLOW_UP_UI = false;
+  const showFollowUpReminders =
+    (tier === 'pro' || DEBUG_SHOW_FOLLOW_UP_UI) && leadsNeedingFollowUp.length > 0;
+
   const filteredLeads = useMemo(() => {
+    if (filter === 'needsFollowUp') return leadsNeedingFollowUp;
     if (filter === 'all') return leads;
     return leads.filter((l) => l.status === filter);
-  }, [leads, filter]);
+  }, [leads, filter, leadsNeedingFollowUp]);
 
   const handleShareForm = async () => {
     if (!formUrl) return;
@@ -182,69 +192,116 @@ export default function LeadsScreen() {
 
   const filters: { key: FilterKey; label: string }[] = [
     { key: 'all', label: t('leads.filterAll') },
+    ...(showFollowUpReminders
+      ? [{ key: 'needsFollowUp' as const, label: t('leads.filterNeedsFollowUp') }]
+      : []),
     { key: 'new', label: t('leads.filterNew') },
     { key: 'contacted', label: t('leads.filterContacted') },
     { key: 'closed', label: t('leads.filterClosed') },
   ];
 
-  const renderLead = ({ item }: { item: Lead }) => (
-    <Pressable
-      onPress={() => router.push(`/(app)/lead-detail?id=${item.id}`)}
-    >
-      <Card variant="elevated" padding="$3.5" marginBottom="$2.5">
-        <XStack alignItems="center" gap="$3">
-          <XStack
-            width={40}
-            height={40}
-            borderRadius={20}
-            backgroundColor={STATUS_COLORS[item.status] + '18'}
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Text
-              fontSize={16}
-              fontWeight="bold"
-              color={STATUS_COLORS[item.status]}
-            >
-              {(item.name ?? '?')[0].toUpperCase()}
-            </Text>
-          </XStack>
-          <YStack flex={1} gap="$0.5">
-            <Text fontSize={15} fontWeight="600" color="$brandSecondary">
-              {item.name ?? '—'}
-            </Text>
-            {item.phone && (
-              <Text fontSize={13} color="$brandTextLight">
-                {item.phone}
-              </Text>
-            )}
-          </YStack>
-          <YStack alignItems="flex-end" gap="$1">
+  const renderLead = ({ item }: { item: Lead }) => {
+    const needsFollowUp = showFollowUpReminders && leadNeedsFollowUp(item);
+    const reminderNew = item.status === 'new';
+    const days = item.last_contacted_at ? daysSince(item.last_contacted_at) : 0;
+    const displayName = item.name ?? '—';
+
+    return (
+      <Pressable
+        onPress={() => router.push(`/(app)/lead-detail?id=${item.id}`)}
+      >
+        <Card variant="elevated" padding="$3.5" marginBottom="$2.5">
+          <XStack alignItems="center" gap="$3">
             <XStack
-              paddingHorizontal="$2"
-              paddingVertical="$1"
-              borderRadius={6}
+              width={40}
+              height={40}
+              borderRadius={20}
               backgroundColor={STATUS_COLORS[item.status] + '18'}
+              justifyContent="center"
+              alignItems="center"
             >
               <Text
-                fontSize={11}
-                fontWeight="600"
+                fontSize={16}
+                fontWeight="bold"
                 color={STATUS_COLORS[item.status]}
               >
-                {t(`leads.status${item.status.charAt(0).toUpperCase() + item.status.slice(1)}`)}
+                {(item.name ?? '?')[0].toUpperCase()}
               </Text>
             </XStack>
-            <Text fontSize={11} color="$brandTextLight">
-              {timeAgo(item.created_at, t)}
-            </Text>
-          </YStack>
-        </XStack>
-      </Card>
-    </Pressable>
-  );
+            <YStack flex={1} gap="$0.5">
+              <Text fontSize={15} fontWeight="600" color="$brandSecondary">
+                {item.name ?? '—'}
+              </Text>
+              {item.phone && (
+                <Text fontSize={13} color="$brandTextLight">
+                  {item.phone}
+                </Text>
+              )}
+            </YStack>
+            <YStack alignItems="flex-end" gap="$1">
+              <XStack
+                paddingHorizontal="$2"
+                paddingVertical="$1"
+                borderRadius={6}
+                backgroundColor={STATUS_COLORS[item.status] + '18'}
+              >
+                <Text
+                  fontSize={11}
+                  fontWeight="600"
+                  color={STATUS_COLORS[item.status]}
+                >
+                  {t(`leads.status${item.status.charAt(0).toUpperCase() + item.status.slice(1)}`)}
+                </Text>
+              </XStack>
+              <Text fontSize={11} color="$brandTextLight">
+                {timeAgo(item.created_at, t)}
+              </Text>
+            </YStack>
+          </XStack>
+          {needsFollowUp && (
+            <YStack marginTop="$3" paddingTop="$2.5" borderTopWidth={1} borderColor="$brandBorder" gap="$2">
+              <XStack alignItems="center" gap="$1.5">
+                <Ionicons name="notifications-outline" size={16} color="#B45309" />
+                <Text fontSize={13} color="$brandTextLight" flex={1}>
+                  {reminderNew
+                    ? t('leads.reminderNew', { name: displayName })
+                    : t('leads.reminderContacted', { name: displayName, days })}
+                </Text>
+              </XStack>
+              <Button
+                variant="outline"
+                height={40}
+                onPress={(e) => {
+                  e?.stopPropagation?.();
+                  router.push(`/(app)/lead-detail?id=${item.id}`);
+                }}
+                icon={<Ionicons name="sparkles" size={14} color="#0F766E" />}
+              >
+                {t('leads.generateFollowUp')}
+              </Button>
+            </YStack>
+          )}
+        </Card>
+      </Pressable>
+    );
+  };
 
   return (
     <YStack flex={1} padding="$4" gap="$3">
+      {/* Pro: follow-up reminder banner */}
+      {showFollowUpReminders && (
+        <Pressable onPress={() => setFilter('needsFollowUp')}>
+          <Card variant="outlined" borderColor="#EAB308" padding="$2.5" backgroundColor="#FEF9C3">
+            <XStack alignItems="center" gap="$2">
+              <Ionicons name="notifications" size={20} color="#B45309" />
+              <Text fontSize={14} fontWeight="500" color="$brandSecondary" flex={1}>
+                {t('leads.followUpReminderBanner', { count: leadsNeedingFollowUp.length })}
+              </Text>
+            </XStack>
+          </Card>
+        </Pressable>
+      )}
+
       {/* Header: count + share + add */}
       <XStack justifyContent="space-between" alignItems="center">
         <Text fontSize={14} color="$brandTextLight">

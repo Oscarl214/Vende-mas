@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { lead, profile } = await req.json();
+    const { lead, profile, bookingUrl } = await req.json();
 
     const lang = profile.default_language === "en" ? "English" : "Spanish";
 
@@ -37,6 +37,7 @@ Respond with ONLY the message text. No labels, no explanations, no quotes.`;
 Type: ${profile.business_type}
 Location: ${profile.location}
 Services: ${profile.services_offered}
+${bookingUrl ? `Booking / lead capture link: ${bookingUrl}` : ""}
 
 Lead Name: ${lead.name ?? "Customer"}
 Lead Phone: ${lead.phone ?? "N/A"}

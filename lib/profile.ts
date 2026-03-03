@@ -14,6 +14,8 @@ export type ProfileData = {
   contact_email?: string;
   website?: string;
   profile_complete?: boolean;
+  booking_type?: 'external' | 'internal';
+  booking_url?: string | null;
 };
 
 export async function getProfile(userId: string) {

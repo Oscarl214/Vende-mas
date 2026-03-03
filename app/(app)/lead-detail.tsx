@@ -14,6 +14,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { TIERS } from '@/constants/tiers';
 import { getLeads, updateLeadStatus, type Lead, type LeadStatus } from '@/lib/leads';
 import { generateFollowUp } from '@/lib/ai';
+import { getEffectiveBookingUrl } from '@/lib/booking';
 
 const STATUS_COLORS: Record<LeadStatus, string> = {
   new: '#16A34A',
@@ -107,6 +108,7 @@ export default function LeadDetailScreen() {
           tone: profile.tone,
           default_language: profile.default_language,
         },
+        bookingUrl: user ? getEffectiveBookingUrl(profile, user.id) : null,
       });
       setFollowUpMessage(result.message);
     } catch (error: any) {
@@ -137,12 +139,33 @@ export default function LeadDetailScreen() {
     Linking.openURL(`sms:${lead.phone}?body=${encoded}`);
   };
 
-  const handleEmail = () => {
+  const handleEmail = async () => {
     if (!lead?.email) return;
     const subject = encodeURIComponent(profile?.business_name ?? '');
     const body = encodeURIComponent(followUpMessage);
     pendingContactPrompt.current = true;
-    Linking.openURL(`mailto:${lead.email}?subject=${subject}&body=${body}`);
+    try {
+      await Linking.openURL(
+        `mailto:${lead.email}?subject=${subject}&body=${body}`,
+      );
+    } catch {
+      pendingContactPrompt.current = false;
+      Alert.alert(
+        t('leadDetail.emailOpenFailed'),
+        t('leadDetail.emailOpenFailedMessage'),
+        [
+          { text: t('common.cancel'), style: 'cancel' },
+          {
+            text: t('leadDetail.copyMessageInstead'),
+            onPress: async () => {
+              await Clipboard.setStringAsync(followUpMessage);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            },
+          },
+        ],
+      );
+    }
   };
 
   const handleCall = () => {
@@ -314,22 +337,111 @@ export default function LeadDetailScreen() {
           </XStack>
 
           {!tierLimits.hasAiFollowUps ? (
-            <Card variant="outlined" borderColor="$brandAccent" gap="$3" alignItems="center" padding="$4">
-              <Ionicons name="lock-closed" size={28} color="#F97316" />
-              <Text fontSize={15} fontWeight="600" color="$brandSecondary" textAlign="center">
-                {t('leadDetail.proOnly')}
-              </Text>
-              <Text fontSize={13} color="$brandTextLight" textAlign="center" lineHeight={20}>
-                {t('leadDetail.proOnlyMessage')}
-              </Text>
-              <Button
-                variant="primary"
-                onPress={() => router.push('/(app)/paywall?reason=leads')}
-                height={44}
-              >
-                {t('leadDetail.upgrade')}
-              </Button>
-            </Card>
+            <YStack gap="$4">
+              <Card variant="outlined" borderColor="$brandAccent" gap="$3" alignItems="center" padding="$4">
+                <Ionicons name="lock-closed" size={28} color="#F97316" />
+                <Text fontSize={15} fontWeight="600" color="$brandSecondary" textAlign="center">
+                  {t('leadDetail.proOnly')}
+                </Text>
+                <Text fontSize={13} color="$brandTextLight" textAlign="center" lineHeight={20}>
+                  {t('leadDetail.proOnlyMessage')}
+                </Text>
+                <Button
+                  variant="primary"
+                  onPress={() => router.push('/(app)/paywall?reason=leads')}
+                  height={44}
+                >
+                  {t('leadDetail.upgrade')}
+                </Button>
+              </Card>
+
+              <YStack gap="$2">
+                <Text fontSize={15} fontWeight="600" color="$brandSecondary">
+                  {t('leadDetail.manualFollowUp')}
+                </Text>
+                <TextArea
+                  value={followUpMessage}
+                  onChangeText={setFollowUpMessage}
+                  placeholder={t('leadDetail.manualFollowUpPlaceholder')}
+                  fontSize={15}
+                  color="$brandText"
+                  backgroundColor="$brandBackground"
+                  borderColor="$brandPrimaryLight"
+                  borderWidth={1}
+                  borderRadius={10}
+                  padding="$3"
+                  minHeight={120}
+                  textAlignVertical="top"
+                  blurOnSubmit
+                  returnKeyType="done"
+                />
+                {followUpMessage.length > 0 && (
+                  <Card variant="elevated" gap="$3">
+                    <Pressable onPress={handleCopy}>
+                      <XStack
+                        alignItems="center"
+                        gap="$1.5"
+                        paddingVertical="$1.5"
+                        paddingHorizontal="$2.5"
+                        borderRadius={8}
+                        backgroundColor="$brandBackground"
+                        alignSelf="flex-start"
+                      >
+                        <Ionicons
+                          name={copied ? 'checkmark-circle' : 'copy-outline'}
+                          size={16}
+                          color={copied ? '#16A34A' : '#0F766E'}
+                        />
+                        <Text
+                          fontSize={13}
+                          fontWeight="500"
+                          color={copied ? '$brandSuccess' : '$brandPrimary'}
+                        >
+                          {copied
+                            ? t('leadDetail.copied')
+                            : t('leadDetail.copyMessage')}
+                        </Text>
+                      </XStack>
+                    </Pressable>
+                    <Text fontSize={13} fontWeight="600" color="$brandSecondary">
+                      {t('leadDetail.sendWith')}
+                    </Text>
+                    <YStack gap="$2">
+                      {lead.phone && (
+                        <Button
+                          variant="outline"
+                          onPress={handleSMS}
+                          height={44}
+                          icon={<Ionicons name="chatbubble-outline" size={18} color="#0F766E" />}
+                        >
+                          SMS
+                        </Button>
+                      )}
+                      {lead.phone && (
+                        <Button
+                          variant="outline"
+                          onPress={handleWhatsApp}
+                          height={44}
+                          icon={<Ionicons name="logo-whatsapp" size={18} color="#25D366" />}
+                        >
+                          WhatsApp
+                        </Button>
+                      )}
+                      {lead.email && (
+                        <Button
+                          variant="outline"
+                          onPress={handleEmail}
+                          height={44}
+                          icon={<Ionicons name="mail-outline" size={18} color="#0F766E" />}
+                        >
+                          Email
+                        </Button>
+                      )}
+                    </YStack>
+                  </Card>
+                )}
+              </YStack>
+            </YStack>
           ) : (
             <YStack gap="$3">
               <Button
@@ -344,7 +456,7 @@ export default function LeadDetailScreen() {
               >
                 {generatingFollowUp
                   ? t('leadDetail.generating')
-                  : t('leadDetail.generateFollowUp')}
+                  : t('leadDetail.generateWithAi')}
               </Button>
 
               {followUpMessage.length > 0 && (
@@ -357,7 +469,6 @@ export default function LeadDetailScreen() {
                       value={followUpMessage}
                       onChangeText={setFollowUpMessage}
                       fontSize={15}
-                      lineHeight={24}
                       color="$brandText"
                       backgroundColor="$brandBackground"
                       borderColor="$brandPrimaryLight"

@@ -36,7 +36,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { contentGoal, platform, promotionDetails, maxLength, profile } =
+    const { contentGoal, platform, promotionDetails, maxLength, profile, bookingUrl } =
       await req.json();
 
     const constraints = PLATFORM_CONSTRAINTS[platform] ?? PLATFORM_CONSTRAINTS.facebook;
@@ -73,6 +73,7 @@ Target Customer: ${profile.target_customer}
 Content Goal: ${contentGoal}
 Platform: ${platform.replace("_", " ")}
 ${promotionDetails ? `Promoting: ${promotionDetails}` : ""}
+${bookingUrl ? `Booking / lead capture link for CTA: ${bookingUrl}` : ""}
 
 Generate one optimized post.`;
 

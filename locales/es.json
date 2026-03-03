@@ -99,6 +99,7 @@
     "editTitle": "Editar negocio",
     "steps": {
       "business": "Tu Negocio",
+      "booking": "Reservas",
       "aiContent": "Contenido AI",
       "brand": "Tu Marca",
       "contact": "Contacto"
@@ -146,6 +147,14 @@
       "locationLabel": "Ubicación *",
       "locationPlaceholder": "Ciudad, Estado"
     },
+    "stepBooking": {
+      "title": "¿Cómo te reservan los clientes?",
+      "subtitle": "Elige cómo recibes reservas para usar el enlace correcto en tu contenido.",
+      "optionExternal": "Tengo un enlace de reservas",
+      "optionInternal": "No tengo — usar formulario de leads",
+      "linkLabel": "Pega tu enlace de reservas",
+      "linkPlaceholder": "https://..."
+    },
     "step1": {
       "title": "Perfil de Contenido AI",
       "subtitle": "Ayúdanos a generar el mejor contenido para tu negocio.",
@@ -178,6 +187,9 @@
       "websitePlaceholder": "www.tunegocio.com"
     },
     "validation": {
+      "bookingTypeRequired": "Elige cómo recibes reservas",
+      "bookingUrlRequired": "Pega tu enlace de reservas",
+      "bookingUrlInvalid": "El enlace debe comenzar con http:// o https://",
       "businessNameRequired": "Nombre de negocio requerido",
       "businessTypeRequired": "Tipo de negocio requerido",
       "locationRequired": "Ubicación requerida",
@@ -212,9 +224,14 @@
     "emptyTitle": "No hay leads todavía",
     "emptyMessage": "Cuando tus clientes llenen un formulario o escaneen tu QR, sus datos aparecerán aquí.",
     "filterAll": "Todos",
+    "filterNeedsFollowUp": "Necesitan seguimiento",
     "filterNew": "Nuevos",
     "filterContacted": "Contactados",
     "filterClosed": "Cerrados",
+    "followUpReminderBanner": "Tienes {{count}} leads que necesitan seguimiento.",
+    "reminderNew": "No has contactado a {{name}} en más de 2 días. ¿Generar seguimiento?",
+    "reminderContacted": "Han pasado {{days}} días desde que contactaste a {{name}}. ¿Generar seguimiento?",
+    "generateFollowUp": "Generar seguimiento",
     "statusNew": "Nuevo",
     "statusContacted": "Contactado",
     "statusClosed": "Cerrado",
@@ -247,14 +264,17 @@
     "updateStatus": "Actualizar estado",
     "followUp": "Seguimiento AI",
     "generateFollowUp": "Generar mensaje de seguimiento",
+    "generateWithAi": "Generar con AI",
     "generating": "Generando...",
     "followUpResult": "Mensaje generado",
+    "manualFollowUp": "Escribe tu seguimiento",
+    "manualFollowUpPlaceholder": "Escribe tu mensaje de seguimiento…",
     "copyMessage": "Copiar",
     "sendWhatsApp": "Enviar por WhatsApp",
     "sendSMS": "Enviar por SMS",
     "copied": "Copiado",
-    "proOnly": "Función Pro",
-    "proOnlyMessage": "Actualiza a Pro para generar mensajes de seguimiento con AI.",
+    "proOnly": "Pro: Seguimiento AI",
+    "proOnlyMessage": "Los usuarios Pro obtienen mensajes de seguimiento personalizados generados con AI. Actualiza para desbloquear.",
     "upgrade": "Ver planes",
     "call": "Llamar",
     "sendWith": "Enviar con",
@@ -262,7 +282,10 @@
     "markContactedTitle": "¿Marcar como Contactado?",
     "markContactedMessage": "¿Contactaste a este lead?",
     "notYet": "Aún no",
-    "yesMarkContacted": "Sí"
+    "yesMarkContacted": "Sí",
+    "emailOpenFailed": "No se pudo abrir la app de correo",
+    "emailOpenFailedMessage": "Copia el mensaje y ábrelo en tu app de correo para pegarlo.",
+    "copyMessageInstead": "Copiar mensaje"
   },
   "settings": {
     "editBusiness": "Editar negocio",

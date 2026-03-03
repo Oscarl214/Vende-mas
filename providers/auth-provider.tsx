@@ -17,6 +17,8 @@ type Profile = {
   contact_email: string | null;
   website: string | null;
   profile_complete: boolean;
+  booking_type: string | null;
+  booking_url: string | null;
 };
 
 export type AuthContextType = {
@@ -43,11 +45,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
+    if (error) {
+      setProfile(null);
+      return;
+    }
     setProfile(data);
   };
 

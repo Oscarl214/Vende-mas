@@ -23,6 +23,7 @@ export async function generateContent(params: {
   promotionDetails?: string;
   maxLength?: string;
   profile: ProfileContext;
+  bookingUrl?: string | null;
 }): Promise<{ caption: string }> {
   const { data, error } = await supabase.functions.invoke('generate-content', {
     body: params,
@@ -34,6 +35,7 @@ export async function generateContent(params: {
 export async function generateFollowUp(params: {
   lead: LeadContext;
   profile: ProfileContext;
+  bookingUrl?: string | null;
 }): Promise<{ message: string }> {
   const { data, error } = await supabase.functions.invoke('generate-followup', {
     body: params,

@@ -99,6 +99,7 @@
     "editTitle": "Edit business",
     "steps": {
       "business": "Your Business",
+      "booking": "Booking",
       "aiContent": "AI Content",
       "brand": "Your Brand",
       "contact": "Contact"
@@ -146,6 +147,14 @@
       "locationLabel": "Location *",
       "locationPlaceholder": "City, State"
     },
+    "stepBooking": {
+      "title": "How do customers book you?",
+      "subtitle": "Choose how you receive bookings so we can use the right link in your content.",
+      "optionExternal": "I have a booking link",
+      "optionInternal": "I don't have one — use built-in lead form",
+      "linkLabel": "Paste your booking link",
+      "linkPlaceholder": "https://..."
+    },
     "step1": {
       "title": "AI Content Profile",
       "subtitle": "Help us generate the best content for your business.",
@@ -178,6 +187,9 @@
       "websitePlaceholder": "www.yourbusiness.com"
     },
     "validation": {
+      "bookingTypeRequired": "Please choose how you receive bookings",
+      "bookingUrlRequired": "Please paste your booking link",
+      "bookingUrlInvalid": "Link must start with http:// or https://",
       "businessNameRequired": "Business name is required",
       "businessTypeRequired": "Business type is required",
       "locationRequired": "Location is required",
@@ -212,9 +224,14 @@
     "emptyTitle": "No leads yet",
     "emptyMessage": "When your clients fill a form or scan your QR, their data will appear here.",
     "filterAll": "All",
+    "filterNeedsFollowUp": "Needs follow-up",
     "filterNew": "New",
     "filterContacted": "Contacted",
     "filterClosed": "Closed",
+    "followUpReminderBanner": "You have {{count}} leads that need follow-up.",
+    "reminderNew": "You haven't contacted {{name}} in over 2 days. Generate a follow-up?",
+    "reminderContacted": "It's been {{days}} days since you last contacted {{name}}. Generate a follow-up?",
+    "generateFollowUp": "Generate Follow-Up",
     "statusNew": "New",
     "statusContacted": "Contacted",
     "statusClosed": "Closed",
@@ -247,14 +264,17 @@
     "updateStatus": "Update status",
     "followUp": "AI Follow-Up",
     "generateFollowUp": "Generate follow-up message",
+    "generateWithAi": "Generate with AI",
     "generating": "Generating...",
     "followUpResult": "Generated message",
+    "manualFollowUp": "Write your follow-up",
+    "manualFollowUpPlaceholder": "Write your follow-up message…",
     "copyMessage": "Copy",
     "sendWhatsApp": "Send via WhatsApp",
     "sendSMS": "Send via SMS",
     "copied": "Copied",
-    "proOnly": "Pro Feature",
-    "proOnlyMessage": "Upgrade to Pro to generate AI follow-up messages.",
+    "proOnly": "Pro: AI Follow-Up",
+    "proOnlyMessage": "Pro users get personalized follow-up messages generated with AI. Upgrade to unlock.",
     "upgrade": "View plans",
     "call": "Call",
     "sendWith": "Send with",
@@ -262,7 +282,10 @@
     "markContactedTitle": "Mark as Contacted?",
     "markContactedMessage": "Did you reach out to this lead?",
     "notYet": "Not yet",
-    "yesMarkContacted": "Yes"
+    "yesMarkContacted": "Yes",
+    "emailOpenFailed": "Could not open mail app",
+    "emailOpenFailedMessage": "Copy the message and open your email app to paste it.",
+    "copyMessageInstead": "Copy message"
   },
   "settings": {
     "editBusiness": "Edit business",

@@ -20,6 +20,7 @@ import { InputField } from '@/components/ui/input';
 import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
 import { generateContent } from '@/lib/ai';
+import { getEffectiveBookingUrl } from '@/lib/booking';
 import { createPost } from '@/lib/posts';
 
 const GOAL_KEYS = [
@@ -37,19 +38,6 @@ const PLATFORM_ICONS: Record<string, string> = {
   instagram: 'logo-instagram',
   google_business: 'business',
 };
-
-function buildFormUrl(
-  userId: string,
-  businessName: string,
-  postId?: string,
-): string {
-  const formBase = process.env.EXPO_PUBLIC_FORM_URL ?? '';
-  const apiBase = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
-  const biz = encodeURIComponent(businessName);
-  let url = `${formBase}?user_id=${userId}&business=${biz}&api=${encodeURIComponent(apiBase)}`;
-  if (postId) url += `&source_post_id=${postId}`;
-  return url;
-}
 
 export default function GeneratePostScreen() {
   const router = useRouter();
@@ -79,10 +67,9 @@ export default function GeneratePostScreen() {
   const [copiedLink, setCopiedLink] = useState(false);
 
   const showResult = generatedCaption.length > 0;
-  const formUrl =
-    user && savedPostId
-      ? buildFormUrl(user.id, profile?.business_name ?? '', savedPostId)
-      : '';
+  const formUrl = user
+    ? getEffectiveBookingUrl(profile ?? null, user.id, savedPostId ?? undefined)
+    : '';
 
   const handleGenerate = async () => {
     if (!goal || !platform) {
@@ -122,6 +109,7 @@ export default function GeneratePostScreen() {
           tone: profile?.tone ?? null,
           default_language: profile?.default_language ?? null,
         },
+        bookingUrl: user ? getEffectiveBookingUrl(profile ?? null, user.id) : null,
       });
       setGeneratedCaption(result.caption);
 

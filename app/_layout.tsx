@@ -22,15 +22,19 @@ function AuthGate() {
 
     const inAuthGroup = segments[0] === '(auth)';
     const inAppGroup = segments[0] === '(app)';
+    const needsProfile = session && (!profile || !profile.profile_complete);
 
     if (!session && !inAuthGroup) {
       router.replace('/(auth)/welcome');
     } else if (session && inAuthGroup) {
-      if (!profile || !profile.profile_complete) {
+      if (needsProfile) {
         router.replace('/(app)/profile-setup');
       } else {
         router.replace('/(app)/(tabs)');
       }
+    } else if (needsProfile && inAppGroup) {
+      // User is signed in but profile missing or incomplete (e.g. new account or DB reset)
+      router.replace('/(app)/profile-setup');
     }
   }, [session, profile, loading, segments]);
 

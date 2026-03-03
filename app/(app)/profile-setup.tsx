@@ -32,6 +32,8 @@ type ProfileFormData = {
   business_name: string;
   business_type: string;
   location: string;
+  booking_type: 'external' | 'internal';
+  booking_url: string;
   services_offered: string;
   target_customer: string;
   tone: string;
@@ -43,23 +45,23 @@ type ProfileFormData = {
 
 function StepIndicator({ current, labels }: { current: number; labels: string[] }) {
   return (
-    <XStack justifyContent="center" alignItems="center" marginBottom="$2">
+    <XStack justifyContent="center" alignItems="flex-start" marginBottom="$2" flexWrap="wrap" gap="$0">
       {labels.map((label, i) => (
-        <XStack key={label} alignItems="center">
-          <YStack alignItems="center" gap="$1.5">
+        <XStack key={label} alignItems="center" flexShrink={0}>
+          <YStack alignItems="center" gap="$0.5" minWidth={38}>
             <XStack
-              width={32}
-              height={32}
-              borderRadius={16}
+              width={26}
+              height={26}
+              borderRadius={13}
               backgroundColor={i <= current ? '$brandPrimary' : '$brandBorder'}
               justifyContent="center"
               alignItems="center"
             >
               {i < current ? (
-                <Ionicons name="checkmark" size={16} color="#fff" />
+                <Ionicons name="checkmark" size={12} color="#fff" />
               ) : (
                 <Text
-                  fontSize={14}
+                  fontSize={12}
                   fontWeight="600"
                   color={i === current ? '$brandTextInverse' : '$brandTextLight'}
                 >
@@ -68,7 +70,8 @@ function StepIndicator({ current, labels }: { current: number; labels: string[] 
               )}
             </XStack>
             <Text
-              fontSize={11}
+              fontSize={10}
+              numberOfLines={1}
               fontWeight={i === current ? '600' : '400'}
               color={i <= current ? '$brandPrimary' : '$brandTextLight'}
             >
@@ -77,11 +80,12 @@ function StepIndicator({ current, labels }: { current: number; labels: string[] 
           </YStack>
           {i < labels.length - 1 && (
             <XStack
-              width={40}
+              width={12}
               height={2}
               backgroundColor={i < current ? '$brandPrimary' : '$brandBorder'}
-              marginHorizontal="$2"
-              marginBottom={20}
+              marginHorizontal="$0.5"
+              marginBottom={14}
+              alignSelf="center"
             />
           )}
         </XStack>
@@ -123,6 +127,7 @@ export default function ProfileSetupScreen() {
 
   const stepLabels = [
     t('profile.steps.business'),
+    t('profile.steps.booking'),
     t('profile.steps.aiContent'),
     t('profile.steps.brand'),
     t('profile.steps.contact'),
@@ -135,18 +140,36 @@ export default function ProfileSetupScreen() {
 
   const profileSchema = useMemo(
     () =>
-      z.object({
-        business_name: z.string().min(1, t('profile.validation.businessNameRequired')),
-        business_type: z.string().min(1, t('profile.validation.businessTypeRequired')),
-        location: z.string().min(1, t('profile.validation.locationRequired')),
-        services_offered: z.string().min(1, t('profile.validation.servicesRequired')),
-        target_customer: z.string().min(1, t('profile.validation.targetCustomerRequired')),
-        tone: z.string().min(1, t('profile.validation.toneRequired')),
-        default_language: z.string().min(1),
-        contact_phone: z.string().optional(),
-        contact_email: z.string().email(t('profile.validation.emailInvalid')).optional().or(z.literal('')),
-        website: z.string().optional(),
-      }),
+      z
+        .object({
+          business_name: z.string().min(1, t('profile.validation.businessNameRequired')),
+          business_type: z.string().min(1, t('profile.validation.businessTypeRequired')),
+          location: z.string().min(1, t('profile.validation.locationRequired')),
+          booking_type: z.enum(['external', 'internal'], {
+            required_error: t('profile.validation.bookingTypeRequired'),
+          }),
+          booking_url: z.string().optional(),
+          services_offered: z.string().min(1, t('profile.validation.servicesRequired')),
+          target_customer: z.string().min(1, t('profile.validation.targetCustomerRequired')),
+          tone: z.string().min(1, t('profile.validation.toneRequired')),
+          default_language: z.string().min(1),
+          contact_phone: z.string().optional(),
+          contact_email: z.string().email(t('profile.validation.emailInvalid')).optional().or(z.literal('')),
+          website: z.string().optional(),
+        })
+        .refine(
+          (data) =>
+            data.booking_type !== 'external' ||
+            (typeof data.booking_url === 'string' && data.booking_url.trim().length > 0),
+          { message: t('profile.validation.bookingUrlRequired'), path: ['booking_url'] },
+        )
+        .refine(
+          (data) =>
+            data.booking_type !== 'external' ||
+            (typeof data.booking_url === 'string' &&
+              (data.booking_url.startsWith('http://') || data.booking_url.startsWith('https://'))),
+          { message: t('profile.validation.bookingUrlInvalid'), path: ['booking_url'] },
+        ),
     [t],
   );
 
@@ -154,6 +177,7 @@ export default function ProfileSetupScreen() {
     control,
     handleSubmit,
     trigger,
+    watch,
     formState: { errors },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -161,6 +185,8 @@ export default function ProfileSetupScreen() {
       business_name: isEditing ? (profile?.business_name ?? '') : '',
       business_type: isEditing ? (profile?.business_type ?? '') : '',
       location: isEditing ? (profile?.location ?? '') : '',
+      booking_type: isEditing && profile?.booking_type === 'external' ? 'external' : 'internal',
+      booking_url: isEditing ? (profile?.booking_url ?? '') : '',
       services_offered: isEditing ? (profile?.services_offered ?? '') : '',
       target_customer: isEditing ? (profile?.target_customer ?? '') : '',
       tone: isEditing ? (profile?.tone ?? '') : '',
@@ -196,10 +222,13 @@ export default function ProfileSetupScreen() {
       const valid = await trigger(['business_name', 'business_type', 'location']);
       if (!valid) return;
     } else if (currentStep === 1) {
+      const valid = await trigger(['booking_type', 'booking_url']);
+      if (!valid) return;
+    } else if (currentStep === 2) {
       const valid = await trigger(['services_offered', 'target_customer', 'tone']);
       if (!valid) return;
     }
-    setCurrentStep((s) => Math.min(s + 1, 3));
+    setCurrentStep((s) => Math.min(s + 1, 4));
   };
 
   const handleBack = () => {
@@ -218,6 +247,7 @@ export default function ProfileSetupScreen() {
       const palette = COLOR_PALETTE_COLORS[selectedPalette];
       await upsertProfile(user.id, {
         ...data,
+        booking_url: data.booking_type === 'external' ? data.booking_url : null,
         logo_url: logoUrl,
         brand_colors: {
           primary: palette.primary,
@@ -355,6 +385,100 @@ export default function ProfileSetupScreen() {
           )}
 
           {currentStep === 1 && (
+            <Animated.View key="step-booking" entering={FadeIn.duration(250)}>
+              <YStack gap="$4">
+                <YStack gap="$1">
+                  <Text fontSize={22} fontWeight="bold" color="$brandSecondary">
+                    {t('profile.stepBooking.title')}
+                  </Text>
+                  <Text fontSize={14} color="$brandTextLight">
+                    {t('profile.stepBooking.subtitle')}
+                  </Text>
+                </YStack>
+
+                <Controller
+                  control={control}
+                  name="booking_type"
+                  render={({ field: { onChange, value } }) => (
+                    <YStack gap="$2">
+                      <Pressable
+                        onPress={() => onChange('external')}
+                        style={{ marginBottom: 4 }}
+                      >
+                        <Card
+                          variant={value === 'external' ? 'outlined' : 'flat'}
+                          borderColor={value === 'external' ? '$brandPrimary' : 'transparent'}
+                          borderWidth={value === 'external' ? 2 : 0}
+                          padding="$3"
+                        >
+                          <XStack alignItems="center" gap="$3">
+                            <Ionicons
+                              name="link"
+                              size={22}
+                              color={value === 'external' ? '#0F766E' : '#9CA3AF'}
+                            />
+                            <Text fontSize={16} color="$brandText" flex={1}>
+                              {t('profile.stepBooking.optionExternal')}
+                            </Text>
+                            {value === 'external' && (
+                              <Ionicons name="checkmark-circle" size={22} color="#0F766E" />
+                            )}
+                          </XStack>
+                        </Card>
+                      </Pressable>
+                      <Pressable onPress={() => onChange('internal')}>
+                        <Card
+                          variant={value === 'internal' ? 'outlined' : 'flat'}
+                          borderColor={value === 'internal' ? '$brandPrimary' : 'transparent'}
+                          borderWidth={value === 'internal' ? 2 : 0}
+                          padding="$3"
+                        >
+                          <XStack alignItems="center" gap="$3">
+                            <Ionicons
+                              name="document-text"
+                              size={22}
+                              color={value === 'internal' ? '#0F766E' : '#9CA3AF'}
+                            />
+                            <Text fontSize={16} color="$brandText" flex={1}>
+                              {t('profile.stepBooking.optionInternal')}
+                            </Text>
+                            {value === 'internal' && (
+                              <Ionicons name="checkmark-circle" size={22} color="#0F766E" />
+                            )}
+                          </XStack>
+                        </Card>
+                      </Pressable>
+                    </YStack>
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="booking_url"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <YStack>
+                      {watch('booking_type') === 'external' && (
+                        <InputField
+                          label={t('profile.stepBooking.linkLabel')}
+                          placeholder={t('profile.stepBooking.linkPlaceholder')}
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          keyboardType="url"
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                          error={errors.booking_url?.message}
+                          onFocus={() => scrollToInput(200)}
+                        />
+                      )}
+                    </YStack>
+                  )}
+                />
+              </YStack>
+            </Animated.View>
+          )}
+
+          {currentStep === 2 && (
             <Animated.View key="step-1" entering={FadeIn.duration(250)}>
               <YStack gap="$4">
                 <YStack gap="$1">
@@ -525,7 +649,7 @@ export default function ProfileSetupScreen() {
             </Animated.View>
           )}
 
-          {currentStep === 2 && (
+          {currentStep === 3 && (
             <Animated.View key="step-2" entering={FadeIn.duration(250)}>
               <YStack gap="$4">
                 <YStack gap="$1">
@@ -603,7 +727,7 @@ export default function ProfileSetupScreen() {
             </Animated.View>
           )}
 
-          {currentStep === 3 && (
+          {currentStep === 4 && (
             <Animated.View key="step-3" entering={FadeIn.duration(250)}>
               <YStack gap="$4">
                 <YStack gap="$1">
@@ -674,7 +798,7 @@ export default function ProfileSetupScreen() {
                 {t('common.back')}
               </Button>
             )}
-            {currentStep < 3 ? (
+            {currentStep < 4 ? (
               <Button variant="primary" onPress={handleNext} flex={1}>
                 {t('common.next')}
               </Button>
