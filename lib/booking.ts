@@ -15,22 +15,33 @@ export function buildFormUrl(
   return url;
 }
 
+/**
+ * Returns a slug-based smart link: e.g. https://app.com/r/vidabebidas
+ */
+export function buildSmartLink(slug: string): string {
+  const formBase = process.env.EXPO_PUBLIC_FORM_URL ?? '';
+  return `${formBase}/r/${slug}`;
+}
+
 type ProfileWithBooking = {
   booking_type?: string | null;
   booking_url?: string | null;
   business_name?: string | null;
+  slug?: string | null;
 };
 
 /**
- * Returns the effective booking URL: external link if set, otherwise the in-app lead form URL.
+ * Returns the link to share with customers. Always points to the lead capture
+ * form so we can track leads first. The form itself handles redirecting to the
+ * external booking page (if one is set) after the visitor submits their info.
  */
 export function getEffectiveBookingUrl(
   profile: ProfileWithBooking | null,
   userId: string,
   postId?: string,
 ): string {
-  if (profile?.booking_type === 'external' && profile?.booking_url) {
-    return profile.booking_url;
+  if (profile?.slug) {
+    return buildSmartLink(profile.slug);
   }
   return buildFormUrl(userId, profile?.business_name ?? '', postId);
 }

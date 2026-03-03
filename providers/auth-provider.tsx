@@ -19,6 +19,7 @@ type Profile = {
   profile_complete: boolean;
   booking_type: string | null;
   booking_url: string | null;
+  slug: string | null;
 };
 
 export type AuthContextType = {

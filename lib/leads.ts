@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-export type LeadStatus = 'new' | 'contacted' | 'closed';
+export type LeadStatus = 'new' | 'contacted' | 'booked' | 'closed';
 
 export type Lead = {
   id: string;
@@ -12,6 +12,7 @@ export type Lead = {
   created_at: string;
   status: LeadStatus;
   last_contacted_at?: string | null;
+  event_date?: string | null;
 };
 
 export type CreateLeadData = {

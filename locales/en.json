@@ -153,7 +153,10 @@
       "optionExternal": "I have a booking link",
       "optionInternal": "I don't have one — use built-in lead form",
       "linkLabel": "Paste your booking link",
-      "linkPlaceholder": "https://..."
+      "linkPlaceholder": "https://...",
+      "slugLabel": "Your smart link",
+      "slugPlaceholder": "e.g. juans-barbershop",
+      "slugPreview": "Your link: app.com/r/{{slug}}"
     },
     "step1": {
       "title": "AI Content Profile",
@@ -196,7 +199,9 @@
       "servicesRequired": "Services offered is required",
       "targetCustomerRequired": "Target customer is required",
       "toneRequired": "Tone is required",
-      "emailInvalid": "Invalid email"
+      "emailInvalid": "Invalid email",
+      "slugInvalid": "Only lowercase letters, numbers, and hyphens",
+      "slugMin": "Must be at least 3 characters"
     }
   },
   "dashboard": {
@@ -227,6 +232,7 @@
     "filterNeedsFollowUp": "Needs follow-up",
     "filterNew": "New",
     "filterContacted": "Contacted",
+    "filterBooked": "Booked",
     "filterClosed": "Closed",
     "followUpReminderBanner": "You have {{count}} leads that need follow-up.",
     "reminderNew": "You haven't contacted {{name}} in over 2 days. Generate a follow-up?",
@@ -234,6 +240,7 @@
     "generateFollowUp": "Generate Follow-Up",
     "statusNew": "New",
     "statusContacted": "Contacted",
+    "statusBooked": "Booked",
     "statusClosed": "Closed",
     "addLead": "Add lead",
     "addLeadTitle": "New lead",
@@ -285,7 +292,8 @@
     "yesMarkContacted": "Yes",
     "emailOpenFailed": "Could not open mail app",
     "emailOpenFailedMessage": "Copy the message and open your email app to paste it.",
-    "copyMessageInstead": "Copy message"
+    "copyMessageInstead": "Copy message",
+    "eventDate": "Event date"
   },
   "settings": {
     "editBusiness": "Edit business",

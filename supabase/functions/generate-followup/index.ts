@@ -19,6 +19,19 @@ Deno.serve(async (req) => {
 
     const lang = profile.default_language === "en" ? "English" : "Spanish";
 
+    const isWarmLead = lead.came_from_smart_link === true;
+    const hasEventDate = !!lead.event_date;
+
+    const warmLeadContext = isWarmLead
+      ? `\n- This lead already showed strong interest — they filled out a contact form and were directed to the booking page. Treat them as a WARM lead, not a cold one.
+- Don't introduce the business or services from scratch — they already know what you offer.
+- Focus on confirming their booking, answering questions, or nudging them to finalize if they haven't yet.`
+      : "";
+
+    const eventDateContext = hasEventDate
+      ? `\n- The lead mentioned an event date: ${lead.event_date}. Reference it naturally (e.g. "for your event on [date]").`
+      : "";
+
     const systemPrompt = `You are a helpful assistant for a small business owner. You write short, warm follow-up messages to potential customers.
 
 Rules:
@@ -26,10 +39,9 @@ Rules:
 - Match the business tone: ${profile.tone ?? "Friendly"}
 - Keep it under 300 characters
 - Be personal — use the lead's first name
-- Reference the business services naturally
-- Include a soft CTA (confirm interest, suggest a time, ask a question)
 - Sound like a real person texting, not a bot
-- No greetings like "Dear" — keep it casual and warm
+- No greetings like "Dear" — keep it casual and warm${warmLeadContext}${eventDateContext}
+- Include a soft CTA (confirm booking, suggest a time, or ask if they need anything)
 
 Respond with ONLY the message text. No labels, no explanations, no quotes.`;
 
@@ -43,6 +55,8 @@ Lead Name: ${lead.name ?? "Customer"}
 Lead Phone: ${lead.phone ?? "N/A"}
 Lead Email: ${lead.email ?? "N/A"}
 Lead Status: ${lead.status}
+${hasEventDate ? `Event Date: ${lead.event_date}` : ""}
+${isWarmLead ? "Source: Filled out smart link form (already shown interest & redirected to booking page)" : "Source: Manually added"}
 
 Generate a follow-up message for this lead.`;
 

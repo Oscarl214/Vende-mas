@@ -32,16 +32,17 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const userId = body.user_id;
     const name = (body.name ?? "").trim();
-    const phone = (body.phone ?? "").trim();
+    const phone = (body.phone ?? "").trim() || null;
     const email = (body.email ?? "").trim() || null;
     const sourcePostId = (body.source_post_id ?? "").trim() || null;
+    const eventDate = (body.event_date ?? "").trim() || null;
 
     if (!userId) {
       return json({ error: "Missing user_id" }, 400);
     }
 
-    if (!name || !phone) {
-      return json({ error: "Name and phone are required" }, 400);
+    if (!name) {
+      return json({ error: "Name is required" }, 400);
     }
 
     const { data: canStore } = await supabase.rpc("check_can_store_lead", {
@@ -58,6 +59,7 @@ Deno.serve(async (req) => {
       phone,
       email,
       source_post_id: sourcePostId,
+      event_date: eventDate,
       status: "new",
     });
 

@@ -31,6 +31,7 @@ import { getEffectiveBookingUrl } from '@/lib/booking';
 const STATUS_COLORS: Record<LeadStatus, string> = {
   new: '#16A34A',
   contacted: '#2563EB',
+  booked: '#7C3AED',
   closed: '#6B7280',
 };
 
@@ -197,6 +198,7 @@ export default function LeadsScreen() {
       : []),
     { key: 'new', label: t('leads.filterNew') },
     { key: 'contacted', label: t('leads.filterContacted') },
+    { key: 'booked', label: t('leads.filterBooked') },
     { key: 'closed', label: t('leads.filterClosed') },
   ];
 

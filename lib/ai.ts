@@ -15,6 +15,8 @@ type LeadContext = {
   phone: string | null;
   email: string | null;
   status: string;
+  event_date?: string | null;
+  came_from_smart_link?: boolean;
 };
 
 export async function generateContent(params: {

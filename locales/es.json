@@ -153,7 +153,10 @@
       "optionExternal": "Tengo un enlace de reservas",
       "optionInternal": "No tengo — usar formulario de leads",
       "linkLabel": "Pega tu enlace de reservas",
-      "linkPlaceholder": "https://..."
+      "linkPlaceholder": "https://...",
+      "slugLabel": "Tu enlace inteligente",
+      "slugPlaceholder": "ej. barberia-juan",
+      "slugPreview": "Tu enlace: app.com/r/{{slug}}"
     },
     "step1": {
       "title": "Perfil de Contenido AI",
@@ -196,7 +199,9 @@
       "servicesRequired": "Servicios ofrecidos es requerido",
       "targetCustomerRequired": "Cliente objetivo es requerido",
       "toneRequired": "Tono es requerido",
-      "emailInvalid": "Correo inválido"
+      "emailInvalid": "Correo inválido",
+      "slugInvalid": "Solo letras minúsculas, números y guiones",
+      "slugMin": "Debe tener al menos 3 caracteres"
     }
   },
   "dashboard": {
@@ -227,6 +232,7 @@
     "filterNeedsFollowUp": "Necesitan seguimiento",
     "filterNew": "Nuevos",
     "filterContacted": "Contactados",
+    "filterBooked": "Reservados",
     "filterClosed": "Cerrados",
     "followUpReminderBanner": "Tienes {{count}} leads que necesitan seguimiento.",
     "reminderNew": "No has contactado a {{name}} en más de 2 días. ¿Generar seguimiento?",
@@ -234,6 +240,7 @@
     "generateFollowUp": "Generar seguimiento",
     "statusNew": "Nuevo",
     "statusContacted": "Contactado",
+    "statusBooked": "Reservado",
     "statusClosed": "Cerrado",
     "addLead": "Agregar lead",
     "addLeadTitle": "Nuevo lead",
@@ -285,7 +292,8 @@
     "yesMarkContacted": "Sí",
     "emailOpenFailed": "No se pudo abrir la app de correo",
     "emailOpenFailedMessage": "Copia el mensaje y ábrelo en tu app de correo para pegarlo.",
-    "copyMessageInstead": "Copiar mensaje"
+    "copyMessageInstead": "Copiar mensaje",
+    "eventDate": "Fecha del evento"
   },
   "settings": {
     "editBusiness": "Editar negocio",

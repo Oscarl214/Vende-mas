@@ -34,6 +34,7 @@ type ProfileFormData = {
   location: string;
   booking_type: 'external' | 'internal';
   booking_url: string;
+  slug: string;
   services_offered: string;
   target_customer: string;
   tone: string;
@@ -42,6 +43,16 @@ type ProfileFormData = {
   contact_email?: string;
   website?: string;
 };
+
+function generateSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 40);
+}
 
 function StepIndicator({ current, labels }: { current: number; labels: string[] }) {
   return (
@@ -149,6 +160,13 @@ export default function ProfileSetupScreen() {
             required_error: t('profile.validation.bookingTypeRequired'),
           }),
           booking_url: z.string().optional(),
+          slug: z
+            .string()
+            .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, t('profile.validation.slugInvalid'))
+            .min(3, t('profile.validation.slugMin'))
+            .max(40)
+            .optional()
+            .or(z.literal('')),
           services_offered: z.string().min(1, t('profile.validation.servicesRequired')),
           target_customer: z.string().min(1, t('profile.validation.targetCustomerRequired')),
           tone: z.string().min(1, t('profile.validation.toneRequired')),
@@ -173,11 +191,14 @@ export default function ProfileSetupScreen() {
     [t],
   );
 
+  const [slugTouched, setSlugTouched] = useState(isEditing && !!profile?.slug);
+
   const {
     control,
     handleSubmit,
     trigger,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -187,6 +208,7 @@ export default function ProfileSetupScreen() {
       location: isEditing ? (profile?.location ?? '') : '',
       booking_type: isEditing && profile?.booking_type === 'external' ? 'external' : 'internal',
       booking_url: isEditing ? (profile?.booking_url ?? '') : '',
+      slug: isEditing ? (profile?.slug ?? '') : '',
       services_offered: isEditing ? (profile?.services_offered ?? '') : '',
       target_customer: isEditing ? (profile?.target_customer ?? '') : '',
       tone: isEditing ? (profile?.tone ?? '') : '',
@@ -221,6 +243,9 @@ export default function ProfileSetupScreen() {
     if (currentStep === 0) {
       const valid = await trigger(['business_name', 'business_type', 'location']);
       if (!valid) return;
+      if (!slugTouched) {
+        setValue('slug', generateSlug(watch('business_name')));
+      }
     } else if (currentStep === 1) {
       const valid = await trigger(['booking_type', 'booking_url']);
       if (!valid) return;
@@ -248,6 +273,7 @@ export default function ProfileSetupScreen() {
       await upsertProfile(user.id, {
         ...data,
         booking_url: data.booking_type === 'external' ? data.booking_url : null,
+        slug: data.slug?.trim() || null,
         logo_url: logoUrl,
         brand_colors: {
           primary: palette.primary,
@@ -474,6 +500,39 @@ export default function ProfileSetupScreen() {
                     </YStack>
                   )}
                 />
+
+                <YStack gap="$2" marginTop="$2">
+                  <Controller
+                    control={control}
+                    name="slug"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                      <InputField
+                        label={t('profile.stepBooking.slugLabel')}
+                        placeholder={t('profile.stepBooking.slugPlaceholder')}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        onChangeText={(text: string) => {
+                          setSlugTouched(true);
+                          onChange(text.toLowerCase().replace(/[^a-z0-9-]/g, ''));
+                        }}
+                        onBlur={onBlur}
+                        value={value}
+                        error={errors.slug?.message}
+                        onFocus={() => scrollToInput(350)}
+                      />
+                    )}
+                  />
+                  {watch('slug') ? (
+                    <Card variant="flat" padding="$2.5">
+                      <XStack alignItems="center" gap="$2">
+                        <Ionicons name="link" size={16} color="#0F766E" />
+                        <Text fontSize={13} color="$brandPrimary" fontWeight="500">
+                          {t('profile.stepBooking.slugPreview', { slug: watch('slug') })}
+                        </Text>
+                      </XStack>
+                    </Card>
+                  ) : null}
+                </YStack>
               </YStack>
             </Animated.View>
           )}

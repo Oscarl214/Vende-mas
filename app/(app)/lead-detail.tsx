@@ -19,12 +19,14 @@ import { getEffectiveBookingUrl } from '@/lib/booking';
 const STATUS_COLORS: Record<LeadStatus, string> = {
   new: '#16A34A',
   contacted: '#2563EB',
+  booked: '#7C3AED',
   closed: '#6B7280',
 };
 
 const STATUS_ICONS: Record<LeadStatus, string> = {
   new: 'ellipse',
   contacted: 'chatbubble-ellipses',
+  booked: 'bookmark',
   closed: 'checkmark-circle',
 };
 
@@ -92,12 +94,15 @@ export default function LeadDetailScreen() {
     setGeneratingFollowUp(true);
     setCopied(false);
     try {
+      const cameFromSmartLink = !!lead.source_post_id || !!lead.event_date;
       const result = await generateFollowUp({
         lead: {
           name: lead.name,
           phone: lead.phone,
           email: lead.email,
           status: lead.status,
+          event_date: lead.event_date,
+          came_from_smart_link: cameFromSmartLink,
         },
         profile: {
           business_name: profile.business_name,
@@ -214,7 +219,7 @@ export default function LeadDetailScreen() {
     );
   }
 
-  const statuses: LeadStatus[] = ['new', 'contacted', 'closed'];
+  const statuses: LeadStatus[] = ['new', 'contacted', 'booked', 'closed'];
 
   return (
     <ScrollView
@@ -273,6 +278,15 @@ export default function LeadDetailScreen() {
               <Ionicons name="mail-outline" size={18} color="#6B7280" />
               <Text fontSize={15} color="$brandText">
                 {lead.email}
+              </Text>
+            </XStack>
+          )}
+
+          {lead.event_date && (
+            <XStack alignItems="center" gap="$2.5" paddingVertical="$1">
+              <Ionicons name="calendar" size={18} color="#7C3AED" />
+              <Text fontSize={15} fontWeight="500" color="$brandText">
+                {t('leadDetail.eventDate')}: {formatDate(lead.event_date, profile?.default_language ?? 'es')}
               </Text>
             </XStack>
           )}
