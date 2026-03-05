@@ -10,9 +10,12 @@ import { useSession } from '@/hooks/use-session';
 import { TIERS, type Tier } from '@/constants/tiers';
 import {
   configureRevenueCat,
+  formatNextBillingDate,
+  getNextBillingDateFromCustomerInfo,
   getSubscriptionStatus,
   purchaseProPlan as rcPurchase,
   restorePurchases as rcRestore,
+  showManageSubscriptions,
   syncSubscriptionToSupabase,
 } from '@/lib/revenuecat';
 import { getMonthlyUsage, type MonthlyUsage } from '@/lib/usage';
@@ -24,9 +27,11 @@ export type SubscriptionContextType = {
   loading: boolean;
   canGeneratePost: boolean;
   canStoreLead: boolean;
+  nextBillingDate: string | null;
   purchasePro: () => Promise<void>;
   restorePurchases: () => Promise<void>;
   refreshUsage: () => Promise<void>;
+  openManageSubscriptions: () => Promise<void>;
 };
 
 const DEFAULT_USAGE: MonthlyUsage = {
@@ -41,15 +46,18 @@ export const SubscriptionContext = createContext<SubscriptionContextType>({
   loading: true,
   canGeneratePost: true,
   canStoreLead: true,
+  nextBillingDate: null,
   purchasePro: async () => {},
   restorePurchases: async () => {},
   refreshUsage: async () => {},
+  openManageSubscriptions: async () => {},
 });
 
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const { user } = useSession();
   const [tier, setTier] = useState<Tier>('free');
   const [usage, setUsage] = useState<MonthlyUsage>(DEFAULT_USAGE);
+  const [nextBillingDate, setNextBillingDate] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const tierLimits = TIERS[tier];
@@ -73,10 +81,13 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     const { data } = await supabase
       .from('subscriptions')
-      .select('tier')
+      .select('tier, expires_at')
       .eq('user_id', user.id)
       .single();
     if (data?.tier) setTier(data.tier as Tier);
+    if (data?.expires_at)
+      setNextBillingDate(formatNextBillingDate(data.expires_at));
+    else if (data?.tier !== 'pro') setNextBillingDate(null);
   }, [user]);
 
   useEffect(() => {
@@ -93,6 +104,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
             await getSubscriptionStatus();
           if (rcTier === 'pro') {
             setTier(rcTier);
+            setNextBillingDate(getNextBillingDateFromCustomerInfo(customerInfo));
             await syncSubscriptionToSupabase(customerInfo, rcTier);
           } else {
             await fetchTierFromSupabase();
@@ -125,6 +137,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     await refreshUsage();
   }, [refreshUsage]);
 
+  const openManageSubscriptions = useCallback(async () => {
+    await showManageSubscriptions();
+  }, []);
+
   return (
     <SubscriptionContext.Provider
       value={{
@@ -133,9 +149,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         loading,
         canGeneratePost,
         canStoreLead,
+        nextBillingDate,
         purchasePro,
         restorePurchases,
         refreshUsage,
+        openManageSubscriptions,
       }}
     >
       {children}

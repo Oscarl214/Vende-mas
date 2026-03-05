@@ -1,0 +1,10 @@
+# Edge Functions called by the public form (no user JWT).
+# See: https://supabase.com/docs/guides/functions/function-configuration
+[functions.resolve-slug]
+verify_jwt = false
+
+[functions.log-post-click]
+verify_jwt = false
+
+[functions.public-lead-form]
+verify_jwt = false

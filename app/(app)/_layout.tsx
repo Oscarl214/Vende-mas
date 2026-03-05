@@ -23,6 +23,13 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
+        name="subscription"
+        options={{
+          headerShown: true,
+          title: t('settings.subscriptionScreen.title'),
+        }}
+      />
+      <Stack.Screen
         name="generate-post"
         options={{
           headerShown: true,

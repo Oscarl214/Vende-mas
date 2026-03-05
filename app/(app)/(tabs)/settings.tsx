@@ -91,7 +91,9 @@ export default function SettingsScreen() {
           label={t('settings.subscription')}
           badge={tierLabel}
           badgeColor={tier === 'pro' ? '#F97316' : '#6B7280'}
-          onPress={() => router.push('/(app)/paywall')}
+          onPress={() =>
+            router.push(tier === 'pro' ? '/(app)/subscription' : '/(app)/paywall')
+          }
         />
         <Separator />
         <SettingsRow

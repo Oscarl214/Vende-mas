@@ -36,21 +36,25 @@ Deno.serve(async (req) => {
       return json({ error: "Missing slug parameter" }, 400);
     }
 
+    const slugPattern = slug.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
     const { data, error } = await supabase
       .from("profiles")
       .select("id, business_name, booking_url, logo_url")
-      .eq("slug", slug)
+      .ilike("slug", slugPattern)
       .single();
 
     if (error || !data) {
       return json({ error: "Business not found" }, 404);
     }
 
+    const anonKey = Deno.env.get("PUBLIC_ANON_KEY") ?? null;
+
     return json({
       user_id: data.id,
       business_name: data.business_name,
       booking_url: data.booking_url,
       logo_url: data.logo_url,
+      anon_key: anonKey,
     });
   } catch (err) {
     return json({ error: (err as Error).message }, 500);

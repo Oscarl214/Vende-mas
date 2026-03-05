@@ -17,10 +17,13 @@ export function buildFormUrl(
 
 /**
  * Returns a slug-based smart link: e.g. https://app.com/r/vidabebidas
+ * If postId is provided, appends ?post= for per-post tracking.
  */
-export function buildSmartLink(slug: string): string {
+export function buildSmartLink(slug: string, postId?: string): string {
   const formBase = process.env.EXPO_PUBLIC_FORM_URL ?? '';
-  return `${formBase}/r/${slug}`;
+  const base = `${formBase}/r/${slug}`;
+  if (postId) return `${base}?post=${postId}`;
+  return base;
 }
 
 type ProfileWithBooking = {
@@ -41,7 +44,7 @@ export function getEffectiveBookingUrl(
   postId?: string,
 ): string {
   if (profile?.slug) {
-    return buildSmartLink(profile.slug);
+    return buildSmartLink(profile.slug, postId);
   }
   return buildFormUrl(userId, profile?.business_name ?? '', postId);
 }

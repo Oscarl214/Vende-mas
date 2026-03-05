@@ -222,6 +222,7 @@
     "postsThisMonth": "Posts this month"
   },
   "leads": {
+    "fromPost": "From post",
     "stored": "Leads stored",
     "limitReached": "Lead limit reached",
     "limitMessage": "Your free plan allows up to {{max}} leads. Upgrade to Pro for {{price}} for unlimited leads.",
@@ -262,6 +263,7 @@
   },
   "leadDetail": {
     "title": "Lead detail",
+    "fromPost": "From post",
     "phoneLabel": "Phone",
     "emailLabel": "Email",
     "sourceLabel": "Source",
@@ -298,6 +300,18 @@
   "settings": {
     "editBusiness": "Edit business",
     "subscription": "Subscription & payments",
+    "subscriptionScreen": {
+      "title": "Subscription",
+      "subtitle": "Manage your plan and billing.",
+      "planLabel": "Plan",
+      "priceLabel": "Price",
+      "nextBillingLabel": "Next billing",
+      "cancelButton": "Cancel Subscription",
+      "cancelConfirmTitle": "Cancel subscription?",
+      "cancelConfirmMessage": "You will keep Pro access until the end of your current billing period.",
+      "cancelConfirmMessageWithDate": "You will keep Pro access until {{date}}.",
+      "cancelConfirmButton": "Yes, cancel"
+    },
     "notifications": "Notifications",
     "language": "Language",
     "signOut": "Sign out",
@@ -405,7 +419,18 @@
   },
   "tabs": {
     "dashboard": "Dashboard",
+    "posts": "Posts",
     "leads": "Leads",
     "settings": "Settings"
+  },
+  "posts": {
+    "loading": "Loading...",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "clicks": "{{count}} clicks",
+    "leads": "{{count}} leads",
+    "emptyTitle": "No posts yet",
+    "emptyMessage": "Generate a post to get a tracking link and see clicks and leads here.",
+    "generateFirst": "Generate your first post"
   }
 }

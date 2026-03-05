@@ -30,42 +30,37 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const userId = body.user_id;
-    const name = (body.name ?? "").trim();
-    const phone = (body.phone ?? "").trim() || null;
-    const email = (body.email ?? "").trim() || null;
-    const sourcePostId = (body.source_post_id ?? "").trim() || null;
-    const eventDate = (body.event_date ?? "").trim() || null;
+    const postId = (body.post_id ?? "").trim();
+    const userId = (body.user_id ?? "").trim();
 
-    if (!userId) {
-      return json({ error: "Missing user_id" }, 400);
+    if (!postId || !userId) {
+      return json({ error: "Missing post_id or user_id" }, 400);
     }
 
-    if (!name) {
-      return json({ error: "Name is required" }, 400);
+    const { data: post, error: fetchError } = await supabase
+      .from("posts")
+      .select("id, user_id, click_count")
+      .eq("id", postId)
+      .single();
+
+    if (fetchError || !post) {
+      return json({ error: "Post not found" }, 404);
     }
 
-    const { data: canStore } = await supabase.rpc("check_can_store_lead", {
-      p_user_id: userId,
-    });
-
-    if (canStore === false) {
-      return json({ closed: true, error: "Form is temporarily unavailable" });
+    if (post.user_id !== userId) {
+      return json({ error: "Post not found" }, 404);
     }
 
-    await supabase.from("leads").insert({
-      user_id: userId,
-      name,
-      phone,
-      email,
-      source_post_id: sourcePostId,
-      event_date: eventDate,
-      status: "new",
-    });
+    const currentCount = (post as { click_count?: number }).click_count ?? 0;
+    const { error: updateError } = await supabase
+      .from("posts")
+      .update({ click_count: currentCount + 1 })
+      .eq("id", postId)
+      .eq("user_id", userId);
 
-    await supabase.rpc("increment_lead_count", {
-      p_user_id: userId,
-    });
+    if (updateError) {
+      return json({ error: updateError.message }, 500);
+    }
 
     return json({ success: true });
   } catch (err) {

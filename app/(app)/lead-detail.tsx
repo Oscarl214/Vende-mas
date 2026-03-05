@@ -13,8 +13,22 @@ import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
 import { TIERS } from '@/constants/tiers';
 import { getLeads, updateLeadStatus, type Lead, type LeadStatus } from '@/lib/leads';
+import { getPost, type Post } from '@/lib/posts';
 import { generateFollowUp } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
+
+const PLATFORM_ICONS: Record<string, string> = {
+  facebook: 'logo-facebook',
+  instagram: 'logo-instagram',
+  tiktok: 'logo-tiktok',
+  google_business: 'business',
+};
+
+function truncateCaption(text: string, max: number): string {
+  const t = text.trim();
+  if (t.length <= max) return t;
+  return t.slice(0, max).trim() + '…';
+}
 
 const STATUS_COLORS: Record<LeadStatus, string> = {
   new: '#16A34A',
@@ -52,6 +66,7 @@ export default function LeadDetailScreen() {
   const { id: leadId } = useLocalSearchParams<{ id: string }>();
 
   const [lead, setLead] = useState<Lead | null>(null);
+  const [sourcePost, setSourcePost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [followUpMessage, setFollowUpMessage] = useState('');
@@ -75,6 +90,24 @@ export default function LeadDetailScreen() {
   useEffect(() => {
     fetchLead();
   }, [fetchLead]);
+
+  useEffect(() => {
+    if (!lead?.source_post_id) {
+      setSourcePost(null);
+      return;
+    }
+    let cancelled = false;
+    getPost(lead.source_post_id)
+      .then((post) => {
+        if (!cancelled) setSourcePost(post);
+      })
+      .catch(() => {
+        if (!cancelled) setSourcePost(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [lead?.source_post_id]);
 
   const handleStatusUpdate = async (status: LeadStatus) => {
     if (!lead) return;
@@ -297,6 +330,24 @@ export default function LeadDetailScreen() {
               {formatDate(lead.created_at, profile?.default_language ?? 'es')}
             </Text>
           </XStack>
+
+          {sourcePost && (
+            <XStack alignItems="center" gap="$2.5" paddingVertical="$1">
+              <Ionicons
+                name={(PLATFORM_ICONS[sourcePost.platform ?? ''] ?? 'document-text') as any}
+                size={18}
+                color="#6B7280"
+              />
+              <YStack flex={1} minWidth={0}>
+                <Text fontSize={12} color="$brandTextLight">
+                  {t('leadDetail.fromPost')}
+                </Text>
+                <Text fontSize={14} color="$brandText" numberOfLines={2}>
+                  {truncateCaption(sourcePost.generated_content, 56)}
+                </Text>
+              </YStack>
+            </XStack>
+          )}
         </Card>
 
         {/* Status Update */}

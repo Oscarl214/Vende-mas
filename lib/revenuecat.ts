@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import Purchases, {
   type CustomerInfo,
   type PurchasesPackage,
@@ -6,6 +6,21 @@ import Purchases, {
 } from 'react-native-purchases';
 import { supabase } from './supabase';
 import { PRO_ENTITLEMENT_ID, type Tier } from '@/constants/tiers';
+
+/** Format expiration date as "April 5" for display. */
+export function formatNextBillingDate(isoDate: string | null | undefined): string | null {
+  if (!isoDate) return null;
+  const d = new Date(isoDate);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+}
+
+export function getNextBillingDateFromCustomerInfo(info: CustomerInfo): string | null {
+  const proEntitlement = info.entitlements.active[PRO_ENTITLEMENT_ID];
+  const exp = proEntitlement?.expirationDate;
+  if (!exp) return null;
+  return formatNextBillingDate(exp);
+}
 
 const API_KEY = Platform.select({
   ios: process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? '',
@@ -80,4 +95,13 @@ export async function syncSubscriptionToSupabase(
       updated_at: new Date().toISOString(),
     })
     .eq('user_id', user.id);
+}
+
+/** Opens the platform's subscription management (App Store / Play Store). */
+export async function showManageSubscriptions(): Promise<void> {
+  if (Platform.OS === 'ios') {
+    await Linking.openURL('https://apps.apple.com/account/subscriptions');
+  } else if (Platform.OS === 'android') {
+    await Linking.openURL('https://play.google.com/store/account/subscriptions');
+  }
 }

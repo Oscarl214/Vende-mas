@@ -103,13 +103,14 @@
 
   var legacyUserId = params.get('user_id');
   var legacyBusiness = params.get('business');
-  var legacySourcePostId = params.get('source_post_id') || '';
+  var sourcePostId = params.get('post') || params.get('source_post_id') || '';
   var legacyApiBase = params.get('api') || '';
 
   var resolvedUserId = null;
   var resolvedBookingUrl = null;
   var resolvedBusinessName = 'Business';
   var resolvedLogoUrl = null;
+  var resolvedAnonKey = null;
   var apiBase = '';
 
   function showView(id) {
@@ -169,7 +170,7 @@
 
     var data = {
       user_id: resolvedUserId,
-      source_post_id: legacySourcePostId || '',
+      source_post_id: sourcePostId || '',
       name: document.getElementById('name').value.trim(),
       phone: phone,
       email: document.getElementById('email').value.trim(),
@@ -177,10 +178,12 @@
     };
 
     var fnUrl = apiBase + '/functions/v1/public-lead-form';
+    var leadHeaders = { 'Content-Type': 'application/json' };
+    if (resolvedAnonKey) leadHeaders['Authorization'] = 'Bearer ' + resolvedAnonKey;
 
     fetch(fnUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: leadHeaders,
       body: JSON.stringify(data)
     })
     .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
@@ -236,6 +239,16 @@
         resolvedBusinessName = result.data.business_name || 'Business';
         resolvedBookingUrl = result.data.booking_url || null;
         resolvedLogoUrl = result.data.logo_url || null;
+        resolvedAnonKey = result.data.anon_key || null;
+        if (sourcePostId && resolvedUserId) {
+          var clickHeaders = { 'Content-Type': 'application/json' };
+          if (resolvedAnonKey) clickHeaders['Authorization'] = 'Bearer ' + resolvedAnonKey;
+          fetch(apiBase + '/functions/v1/log-post-click', {
+            method: 'POST',
+            headers: clickHeaders,
+            body: JSON.stringify({ post_id: sourcePostId, user_id: resolvedUserId })
+          }).catch(function() {});
+        }
         initForm();
       })
       .catch(function() {
@@ -248,6 +261,16 @@
     resolvedBusinessName = legacyBusiness ? decodeURIComponent(legacyBusiness) : 'Business';
     resolvedBookingUrl = null;
     resolvedLogoUrl = null;
+    if (sourcePostId) {
+      var legacyAnonKey = params.get('anon_key') || '';
+      var legacyClickHeaders = { 'Content-Type': 'application/json' };
+      if (legacyAnonKey) legacyClickHeaders['Authorization'] = 'Bearer ' + legacyAnonKey;
+      fetch(apiBase + '/functions/v1/log-post-click', {
+        method: 'POST',
+        headers: legacyClickHeaders,
+        body: JSON.stringify({ post_id: sourcePostId, user_id: legacyUserId })
+      }).catch(function() {});
+    }
     initForm();
 
   } else {

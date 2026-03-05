@@ -26,7 +26,21 @@ import {
   type Lead,
   type LeadStatus,
 } from '@/lib/leads';
+import { getPosts, type Post } from '@/lib/posts';
 import { getEffectiveBookingUrl } from '@/lib/booking';
+
+const PLATFORM_ICONS: Record<string, string> = {
+  facebook: 'logo-facebook',
+  instagram: 'logo-instagram',
+  tiktok: 'logo-tiktok',
+  google_business: 'business',
+};
+
+function truncateCaption(text: string, max: number): string {
+  const t = text.trim();
+  if (t.length <= max) return t;
+  return t.slice(0, max).trim() + '…';
+}
 
 const STATUS_COLORS: Record<LeadStatus, string> = {
   new: '#16A34A',
@@ -63,6 +77,7 @@ export default function LeadsScreen() {
   const proPrice = t('tiers.proPrice');
 
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<FilterKey>('all');
   const [addSheetOpen, setAddSheetOpen] = useState(false);
@@ -77,14 +92,20 @@ export default function LeadsScreen() {
   const fetchLeads = useCallback(async () => {
     if (!user) return;
     try {
-      const data = await getLeads(user.id);
-      setLeads(data);
+      const [leadsData, postsData] = await Promise.all([
+        getLeads(user.id),
+        getPosts(user.id),
+      ]);
+      setLeads(leadsData);
+      setPosts(postsData);
     } catch {
       // silently fail
     } finally {
       setLoading(false);
     }
   }, [user]);
+
+  const postsById = useMemo(() => new Map(posts.map((p) => [p.id, p])), [posts]);
 
   useFocusEffect(
     useCallback(() => {
@@ -207,6 +228,7 @@ export default function LeadsScreen() {
     const reminderNew = item.status === 'new';
     const days = item.last_contacted_at ? daysSince(item.last_contacted_at) : 0;
     const displayName = item.name ?? '—';
+    const sourcePost = item.source_post_id ? postsById.get(item.source_post_id) : null;
 
     return (
       <Pressable
@@ -260,6 +282,18 @@ export default function LeadsScreen() {
               </Text>
             </YStack>
           </XStack>
+          {sourcePost && (
+            <XStack marginTop="$2" alignItems="center" gap="$1.5" flexWrap="wrap">
+              <Ionicons
+                name={(PLATFORM_ICONS[sourcePost.platform ?? ''] ?? 'document-text') as any}
+                size={14}
+                color="#6B7280"
+              />
+              <Text fontSize={12} color="$brandTextLight" numberOfLines={1} flex={1} minWidth={0}>
+                {t('leads.fromPost')}: {truncateCaption(sourcePost.generated_content, 38)}
+              </Text>
+            </XStack>
+          )}
           {needsFollowUp && (
             <YStack marginTop="$3" paddingTop="$2.5" borderTopWidth={1} borderColor="$brandBorder" gap="$2">
               <XStack alignItems="center" gap="$1.5">

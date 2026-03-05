@@ -9,6 +9,7 @@ export type Post = {
   prompt_notes: string | null;
   generated_content: string;
   created_at: string;
+  click_count: number;
 };
 
 export type CreatePostData = {

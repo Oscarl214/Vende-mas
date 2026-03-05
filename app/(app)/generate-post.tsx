@@ -401,8 +401,8 @@ export default function GeneratePostScreen() {
                   </XStack>
                 </Card>
 
-                {/* Lead form link */}
-                {formUrl.length > 0 && (
+                {/* Lead form link – only show when post was saved so the URL includes ?post= for tracking */}
+                {formUrl.length > 0 && savedPostId != null && (
                   <Card variant="outlined" padding="$3.5" gap="$2.5">
                     <XStack alignItems="center" gap="$2">
                       <Ionicons name="link" size={18} color="#0F766E" />
