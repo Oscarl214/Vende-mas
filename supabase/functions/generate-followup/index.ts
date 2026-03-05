@@ -21,27 +21,35 @@ Deno.serve(async (req) => {
 
     const isWarmLead = lead.came_from_smart_link === true;
     const hasEventDate = !!lead.event_date;
+    const hasBookingLink = !!bookingUrl;
 
-    const warmLeadContext = isWarmLead
-      ? `\n- This lead already showed strong interest — they filled out a contact form and were directed to the booking page. Treat them as a WARM lead, not a cold one.
-- Don't introduce the business or services from scratch — they already know what you offer.
-- Focus on confirming their booking, answering questions, or nudging them to finalize if they haven't yet.`
-      : "";
+    let leadContextRules = "";
 
-    const eventDateContext = hasEventDate
-      ? `\n- The lead mentioned an event date: ${lead.event_date}. Reference it naturally (e.g. "for your event on [date]").`
-      : "";
+    if (hasEventDate) {
+      leadContextRules += `\n- PRIORITY #1 — EVENT DATE: The lead has an event on ${lead.event_date}. Build the ENTIRE message around this date. Reference it explicitly. Create urgency around it ("your [date] event is coming up!", "let's lock in [date] before spots fill up").`;
+    }
 
-    const systemPrompt = `You are a helpful assistant for a small business owner. You write short, warm follow-up messages to potential customers.
+    if (isWarmLead) {
+      leadContextRules += `\n- This is a WARM lead — they already filled out your contact form and were sent to your booking page. They know your business. Don't re-introduce yourself or your services.
+- Focus on: did they complete the booking? If not, nudge them to finalize. If yes, confirm details.`;
+    }
+
+    if (hasBookingLink) {
+      leadContextRules += `\n- INCLUDE THE BOOKING LINK in the message: ${bookingUrl} — make it easy for them to take action right now. Place it at the end as a direct CTA.`;
+    }
+
+    leadContextRules += `\n- URGENCY: Add natural scarcity — "spots are filling up fast", "we only have a few openings left", "secure your date before it's taken". Don't be pushy, but create real FOMO.`;
+    leadContextRules += `\n- LOCAL TRUST: Mention the business location naturally to build proximity and trust — "right here in ${profile.location ?? "your area"}".`;
+
+    const systemPrompt = `You are a conversion-focused follow-up assistant for a small local business. Your goal is to turn this lead into a PAYING customer with one short, warm message.
 
 Rules:
 - Write in ${lang}
 - Match the business tone: ${profile.tone ?? "Friendly"}
-- Keep it under 300 characters
-- Be personal — use the lead's first name
-- Sound like a real person texting, not a bot
-- No greetings like "Dear" — keep it casual and warm${warmLeadContext}${eventDateContext}
-- Include a soft CTA (confirm booking, suggest a time, or ask if they need anything)
+- Keep it under 350 characters
+- Use the lead's first name
+- Sound like a real person texting, not a bot or a salesperson
+- No greetings like "Dear" — casual and warm${leadContextRules}
 
 Respond with ONLY the message text. No labels, no explanations, no quotes.`;
 
@@ -49,16 +57,14 @@ Respond with ONLY the message text. No labels, no explanations, no quotes.`;
 Type: ${profile.business_type}
 Location: ${profile.location}
 Services: ${profile.services_offered}
-${bookingUrl ? `Booking / lead capture link: ${bookingUrl}` : ""}
 
 Lead Name: ${lead.name ?? "Customer"}
-Lead Phone: ${lead.phone ?? "N/A"}
-Lead Email: ${lead.email ?? "N/A"}
 Lead Status: ${lead.status}
-${hasEventDate ? `Event Date: ${lead.event_date}` : ""}
-${isWarmLead ? "Source: Filled out smart link form (already shown interest & redirected to booking page)" : "Source: Manually added"}
+${hasEventDate ? `Event Date (center the message around this): ${lead.event_date}` : ""}
+${isWarmLead ? "Source: Already filled out smart link form & was redirected to booking page (WARM lead)" : "Source: Manually added (may need more context about the business)"}
+${hasBookingLink ? `Booking link to include: ${bookingUrl}` : ""}
 
-Generate a follow-up message for this lead.`;
+Generate a follow-up message that drives this lead to book and pay.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",

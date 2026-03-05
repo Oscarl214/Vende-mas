@@ -31,11 +31,12 @@ const GOAL_KEYS = [
   'review_request',
 ] as const;
 
-const PLATFORM_KEYS = ['facebook', 'instagram', 'google_business'] as const;
+const PLATFORM_KEYS = ['facebook', 'instagram', 'tiktok', 'google_business'] as const;
 
 const PLATFORM_ICONS: Record<string, string> = {
   facebook: 'logo-facebook',
   instagram: 'logo-instagram',
+  tiktok: 'logo-tiktok',
   google_business: 'business',
 };
 

@@ -372,6 +372,7 @@
     "platforms": {
       "facebook": "Facebook",
       "instagram": "Instagram",
+      "tiktok": "TikTok",
       "google_business": "Google Business"
     },
     "promotionLabel": "¿Qué estás promocionando?",
