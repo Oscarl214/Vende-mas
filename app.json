@@ -47,7 +47,14 @@
           "photosPermission": "Allow VendeMás to access your photos to upload your business logo."
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#0F766E"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -9,10 +9,11 @@ import * as Clipboard from 'expo-clipboard';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { InputField } from '@/components/ui/input';
 import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
 import { TIERS } from '@/constants/tiers';
-import { getLeads, updateLeadStatus, type Lead, type LeadStatus } from '@/lib/leads';
+import { getLeads, updateLeadStatus, updateLeadRevenue, type Lead, type LeadStatus } from '@/lib/leads';
 import { getPost, type Post } from '@/lib/posts';
 import { generateFollowUp } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
@@ -72,6 +73,8 @@ export default function LeadDetailScreen() {
   const [followUpMessage, setFollowUpMessage] = useState('');
   const [generatingFollowUp, setGeneratingFollowUp] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [revenueInput, setRevenueInput] = useState('');
+  const [savingRevenue, setSavingRevenue] = useState(false);
   const pendingContactPrompt = useRef(false);
 
   const fetchLead = useCallback(async () => {
@@ -79,7 +82,10 @@ export default function LeadDetailScreen() {
     try {
       const leads = await getLeads(user.id);
       const found = leads.find((l) => l.id === leadId);
-      if (found) setLead(found);
+      if (found) {
+        setLead(found);
+        if (found.revenue != null) setRevenueInput(String(found.revenue));
+      }
     } catch {
       // silently fail
     } finally {
@@ -119,6 +125,26 @@ export default function LeadDetailScreen() {
       Alert.alert(t('common.error'), error.message);
     } finally {
       setUpdatingStatus(false);
+    }
+  };
+
+  const handleSaveRevenue = async () => {
+    if (!lead) return;
+    const parsed = parseFloat(revenueInput);
+    const value = isNaN(parsed) ? null : parsed;
+    setSavingRevenue(true);
+    try {
+      const updated = await updateLeadRevenue(lead.id, value);
+      setLead(updated);
+      setRevenueInput(value != null ? String(value) : '');
+      Alert.alert(
+        t('leadDetail.revenueSaved'),
+        value != null ? `$${value.toLocaleString()}` : '',
+      );
+    } catch (error: any) {
+      Alert.alert(t('common.error'), error.message);
+    } finally {
+      setSavingRevenue(false);
     }
   };
 
@@ -292,6 +318,14 @@ export default function LeadDetailScreen() {
                   {t(`leads.status${lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}`)}
                 </Text>
               </XStack>
+              {lead.revenue != null && (
+                <XStack alignItems="center" gap="$1">
+                  <Ionicons name="cash-outline" size={13} color="#16A34A" />
+                  <Text fontSize={13} fontWeight="600" color="#16A34A">
+                    ${lead.revenue.toLocaleString()}
+                  </Text>
+                </XStack>
+              )}
             </YStack>
           </XStack>
 
@@ -391,6 +425,39 @@ export default function LeadDetailScreen() {
             })}
           </XStack>
         </YStack>
+
+        {/* Revenue Section */}
+        {(lead.status === 'booked' || lead.status === 'closed') && (
+          <YStack gap="$2">
+            <XStack alignItems="center" gap="$2">
+              <Ionicons name="cash-outline" size={18} color="#16A34A" />
+              <Text fontSize={15} fontWeight="600" color="$brandSecondary">
+                {t('leadDetail.revenueLabel')}
+              </Text>
+            </XStack>
+            <XStack gap="$2.5" alignItems="flex-end">
+              <YStack flex={1}>
+                <InputField
+                  label="$"
+                  placeholder={t('leadDetail.revenuePlaceholder')}
+                  keyboardType="numeric"
+                  value={revenueInput}
+                  onChangeText={setRevenueInput}
+                />
+              </YStack>
+              <Button
+                variant="primary"
+                height={52}
+                onPress={handleSaveRevenue}
+                disabled={savingRevenue || !revenueInput.trim()}
+              >
+                {savingRevenue
+                  ? t('common.saving')
+                  : t('leadDetail.saveRevenue')}
+              </Button>
+            </XStack>
+          </YStack>
+        )}
 
         {/* AI Follow-Up Section */}
         <YStack gap="$2" marginTop="$2">

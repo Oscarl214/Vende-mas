@@ -43,6 +43,7 @@ export default function PaywallScreen() {
     { labelKey: 'paywall.features.aiPosts', free: '3', pro: t('paywall.features.unlimited') },
     { labelKey: 'paywall.features.leads', free: '5', pro: t('paywall.features.unlimited') },
     { labelKey: 'paywall.features.aiFollowUp', free: false, pro: true },
+    { labelKey: 'paywall.features.followUpReminders', free: false, pro: true },
     { labelKey: 'paywall.features.smsAutomation', free: false, pro: true },
     { labelKey: 'paywall.features.advancedAutomation', free: false, pro: true },
   ];

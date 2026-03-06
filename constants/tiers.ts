@@ -7,6 +7,7 @@ export const TIERS = {
     hasAutomation: false,
     hasAiFollowUps: false,
     hasSmsAutomation: false,
+    hasFollowUpReminders: false,
   },
   pro: {
     postsPerMonth: Infinity,
@@ -14,6 +15,7 @@ export const TIERS = {
     hasAutomation: true,
     hasAiFollowUps: true,
     hasSmsAutomation: true,
+    hasFollowUpReminders: true,
   },
 } as const;
 

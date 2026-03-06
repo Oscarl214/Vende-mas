@@ -43,6 +43,13 @@ export default function AppLayout() {
           title: t('leadDetail.title'),
         }}
       />
+      <Stack.Screen
+        name="post-detail"
+        options={{
+          headerShown: true,
+          title: t('postDetail.title'),
+        }}
+      />
     </Stack>
   );
 }

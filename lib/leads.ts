@@ -13,6 +13,7 @@ export type Lead = {
   status: LeadStatus;
   last_contacted_at?: string | null;
   event_date?: string | null;
+  revenue?: number | null;
 };
 
 export type CreateLeadData = {
@@ -96,4 +97,15 @@ export async function getLeadsByPost(postId: string) {
     .order('created_at', { ascending: false });
   if (error) throw error;
   return data as Lead[];
+}
+
+export async function updateLeadRevenue(leadId: string, revenue: number | null) {
+  const { data, error } = await supabase
+    .from('leads')
+    .update({ revenue })
+    .eq('id', leadId)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as Lead;
 }

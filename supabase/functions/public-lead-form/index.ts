@@ -67,6 +67,32 @@ Deno.serve(async (req) => {
       p_user_id: userId,
     });
 
+    // Send push notification to the business owner
+    try {
+      const { data: tokens } = await supabase
+        .from("push_tokens")
+        .select("token")
+        .eq("user_id", userId);
+
+      if (tokens && tokens.length > 0) {
+        const messages = tokens.map((row: { token: string }) => ({
+          to: row.token,
+          sound: "default",
+          title: "New Lead",
+          body: `${name} requested a quote.`,
+          data: { type: "new_lead" },
+        }));
+
+        await fetch("https://exp.host/--/api/v2/push/send", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(messages),
+        });
+      }
+    } catch {
+      // Push notification failure should not block lead creation
+    }
+
     return json({ success: true });
   } catch (err) {
     return json({ error: (err as Error).message }, 500);

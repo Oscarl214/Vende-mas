@@ -101,67 +101,69 @@ export default function PostsScreen() {
     const isCopied = copiedId === post.id;
 
     return (
-      <Card variant="outlined" padding="$4" gap="$3">
-        <Text fontSize={13} color="$brandTextLight">
-          {truncateCaption(post.generated_content)}
-        </Text>
-        <XStack flexWrap="wrap" gap="$2" alignItems="center">
-          <XStack alignItems="center" gap="$1">
-            <Ionicons name={iconName as any} size={16} color="#6B7280" />
-            <Text fontSize={12} color="$brandTextLight" textTransform="capitalize">
-              {platform.replace('_', ' ')}
-            </Text>
-          </XStack>
-          <Text fontSize={12} color="$brandTextLight">
-            {formatPostDate(post.created_at, lang)}
+      <Pressable onPress={() => router.push(`/(app)/post-detail?id=${post.id}`)}>
+        <Card variant="outlined" padding="$4" gap="$3">
+          <Text fontSize={13} color="$brandTextLight">
+            {truncateCaption(post.generated_content)}
           </Text>
-        </XStack>
-        {link
-          ? (
-            <XStack alignItems="center" gap="$2" flexWrap="wrap">
-              <Text
-                fontSize={11}
-                color="$brandPrimary"
-                numberOfLines={1}
-                flex={1}
-                minWidth={0}
-              >
-                {link.length > 42 ? link.slice(0, 42) + '…' : link}
+          <XStack flexWrap="wrap" gap="$2" alignItems="center">
+            <XStack alignItems="center" gap="$1">
+              <Ionicons name={iconName as any} size={16} color="#6B7280" />
+              <Text fontSize={12} color="$brandTextLight" textTransform="capitalize">
+                {platform.replace('_', ' ')}
               </Text>
-              <Pressable onPress={() => handleCopyLink(post.id)}>
-                <XStack alignItems="center" gap="$1">
-                  <Ionicons
-                    name={isCopied ? 'checkmark-circle' : 'copy-outline'}
-                    size={16}
-                    color={isCopied ? '#16A34A' : '#0F766E'}
-                  />
-                  <Text
-                    fontSize={12}
-                    fontWeight="500"
-                    color={isCopied ? '$brandSuccess' : '$brandPrimary'}
-                  >
-                    {isCopied ? t('posts.copied') : t('posts.copyLink')}
-                  </Text>
-                </XStack>
-              </Pressable>
             </XStack>
-            )
-          : null}
-        <XStack gap="$4">
-          <XStack alignItems="center" gap="$1">
-            <Ionicons name="hand-left-outline" size={14} color="#6B7280" />
-            <Text fontSize={13} color="$brandText">
-              {t('posts.clicks', { count: clicks })}
+            <Text fontSize={12} color="$brandTextLight">
+              {formatPostDate(post.created_at, lang)}
             </Text>
           </XStack>
-          <XStack alignItems="center" gap="$1">
-            <Ionicons name="people-outline" size={14} color="#6B7280" />
-            <Text fontSize={13} color="$brandText">
-              {t('posts.leads', { count: leadsCount })}
-            </Text>
+          {link
+            ? (
+              <XStack alignItems="center" gap="$2" flexWrap="wrap">
+                <Text
+                  fontSize={11}
+                  color="$brandPrimary"
+                  numberOfLines={1}
+                  flex={1}
+                  minWidth={0}
+                >
+                  {link.length > 42 ? link.slice(0, 42) + '…' : link}
+                </Text>
+                <Pressable onPress={(e) => { e.stopPropagation(); handleCopyLink(post.id); }}>
+                  <XStack alignItems="center" gap="$1">
+                    <Ionicons
+                      name={isCopied ? 'checkmark-circle' : 'copy-outline'}
+                      size={16}
+                      color={isCopied ? '#16A34A' : '#0F766E'}
+                    />
+                    <Text
+                      fontSize={12}
+                      fontWeight="500"
+                      color={isCopied ? '$brandSuccess' : '$brandPrimary'}
+                    >
+                      {isCopied ? t('posts.copied') : t('posts.copyLink')}
+                    </Text>
+                  </XStack>
+                </Pressable>
+              </XStack>
+              )
+            : null}
+          <XStack gap="$4">
+            <XStack alignItems="center" gap="$1">
+              <Ionicons name="hand-left-outline" size={14} color="#6B7280" />
+              <Text fontSize={13} color="$brandText">
+                {t('posts.clicks', { count: clicks })}
+              </Text>
+            </XStack>
+            <XStack alignItems="center" gap="$1">
+              <Ionicons name="people-outline" size={14} color="#6B7280" />
+              <Text fontSize={13} color="$brandText">
+                {t('posts.leads', { count: leadsCount })}
+              </Text>
+            </XStack>
           </XStack>
-        </XStack>
-      </Card>
+        </Card>
+      </Pressable>
     );
   };
 

@@ -295,7 +295,11 @@
     "emailOpenFailed": "No se pudo abrir la app de correo",
     "emailOpenFailedMessage": "Copia el mensaje y ábrelo en tu app de correo para pegarlo.",
     "copyMessageInstead": "Copiar mensaje",
-    "eventDate": "Fecha del evento"
+    "eventDate": "Fecha del evento",
+    "revenueLabel": "Ingreso",
+    "revenuePlaceholder": "Monto ganado",
+    "revenueSaved": "Guardado",
+    "saveRevenue": "Guardar"
   },
   "settings": {
     "editBusiness": "Editar negocio",
@@ -313,6 +317,8 @@
       "cancelConfirmButton": "Sí, cancelar"
     },
     "notifications": "Notificaciones",
+    "notificationsEnabled": "Activadas",
+    "notificationsDisabled": "Desactivadas",
     "language": "Idioma",
     "signOut": "Cerrar sesión",
     "signOutConfirm": {
@@ -342,6 +348,7 @@
       "aiPosts": "Posts con AI por mes",
       "leads": "Leads almacenados",
       "aiFollowUp": "Seguimiento AI",
+      "followUpReminders": "Recordatorios de seguimiento",
       "smsAutomation": "Automatización SMS",
       "advancedAutomation": "Automatización avanzada",
       "unlimited": "Ilimitados"
@@ -432,5 +439,27 @@
     "emptyTitle": "Aún no hay posts",
     "emptyMessage": "Genera un post para obtener un enlace de seguimiento y ver clics y leads aquí.",
     "generateFirst": "Genera tu primer post"
+  },
+  "postDetail": {
+    "title": "Rendimiento del Post",
+    "fullPost": "Post Completo",
+    "performance": "Rendimiento",
+    "trackingLink": "Enlace de Seguimiento",
+    "copyPost": "Copiar post",
+    "copyWithLink": "Copiar post + enlace",
+    "copied": "Copiado",
+    "leadsAttracted": "Leads atraídos",
+    "noLeads": "Aún no hay leads de este post.",
+    "clicks": "Clics",
+    "leads": "Leads",
+    "revenue": "Ingreso"
+  },
+  "notifications": {
+    "newLeadTitle": "Nuevo Lead",
+    "newLeadBody": "{{name}} solicitó una cotización.",
+    "followUpTitle": "Recordatorio de seguimiento",
+    "followUpBody": "Aún no has respondido a {{name}}.",
+    "weeklySummaryTitle": "Resultados semanales",
+    "weeklySummaryBody": "Generaste {{leads}} leads, {{bookings}} reservas y ${{revenue}} en ingresos esta semana."
   }
 }

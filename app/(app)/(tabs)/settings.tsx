@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
+import { useNotifications } from '@/hooks/use-notifications';
 import { useLanguage } from '@/providers/language-provider';
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
@@ -22,6 +23,7 @@ export default function SettingsScreen() {
   const { profile, user, signOut } = useSession();
   const { tier } = useSubscription();
   const { language, changeLanguage } = useLanguage();
+  const { notificationsEnabled, toggleNotifications } = useNotifications();
   const [langPickerOpen, setLangPickerOpen] = useState(false);
 
   const tierLabel = t(`tiers.${tier}`);
@@ -99,7 +101,8 @@ export default function SettingsScreen() {
         <SettingsRow
           icon="notifications-outline"
           label={t('settings.notifications')}
-          onPress={() => {}}
+          value={notificationsEnabled ? t('settings.notificationsEnabled') : t('settings.notificationsDisabled')}
+          onPress={toggleNotifications}
         />
         <Separator />
         <SettingsRow

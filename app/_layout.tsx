@@ -7,6 +7,7 @@ import { PortalProvider } from '@tamagui/portal';
 import config from '@/tamagui.config';
 import { AuthProvider } from '@/providers/auth-provider';
 import { SubscriptionProvider } from '@/providers/subscription-provider';
+import { NotificationProvider } from '@/providers/notification-provider';
 import { LanguageProvider } from '@/providers/language-provider';
 import { useSession } from '@/hooks/use-session';
 import { ActivityIndicator, View } from 'react-native';
@@ -60,8 +61,10 @@ export default function RootLayout() {
           <ThemeProvider value={DefaultTheme}>
             <AuthProvider>
               <SubscriptionProvider>
-                <AuthGate />
-                <StatusBar style="auto" />
+                <NotificationProvider>
+                  <AuthGate />
+                  <StatusBar style="auto" />
+                </NotificationProvider>
               </SubscriptionProvider>
             </AuthProvider>
           </ThemeProvider>

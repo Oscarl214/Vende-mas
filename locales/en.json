@@ -295,7 +295,11 @@
     "emailOpenFailed": "Could not open mail app",
     "emailOpenFailedMessage": "Copy the message and open your email app to paste it.",
     "copyMessageInstead": "Copy message",
-    "eventDate": "Event date"
+    "eventDate": "Event date",
+    "revenueLabel": "Revenue",
+    "revenuePlaceholder": "Amount earned",
+    "revenueSaved": "Saved",
+    "saveRevenue": "Save"
   },
   "settings": {
     "editBusiness": "Edit business",
@@ -313,6 +317,8 @@
       "cancelConfirmButton": "Yes, cancel"
     },
     "notifications": "Notifications",
+    "notificationsEnabled": "Enabled",
+    "notificationsDisabled": "Disabled",
     "language": "Language",
     "signOut": "Sign out",
     "signOutConfirm": {
@@ -342,6 +348,7 @@
       "aiPosts": "AI posts per month",
       "leads": "Leads stored",
       "aiFollowUp": "AI follow-up",
+      "followUpReminders": "Follow-up reminders",
       "smsAutomation": "SMS automation",
       "advancedAutomation": "Advanced automation",
       "unlimited": "Unlimited"
@@ -432,5 +439,27 @@
     "emptyTitle": "No posts yet",
     "emptyMessage": "Generate a post to get a tracking link and see clicks and leads here.",
     "generateFirst": "Generate your first post"
+  },
+  "postDetail": {
+    "title": "Post Performance",
+    "fullPost": "Full Post",
+    "performance": "Performance",
+    "trackingLink": "Tracking Link",
+    "copyPost": "Copy post",
+    "copyWithLink": "Copy post + link",
+    "copied": "Copied",
+    "leadsAttracted": "Leads attracted",
+    "noLeads": "No leads from this post yet.",
+    "clicks": "Clicks",
+    "leads": "Leads",
+    "revenue": "Revenue"
+  },
+  "notifications": {
+    "newLeadTitle": "New Lead",
+    "newLeadBody": "{{name}} requested a quote.",
+    "followUpTitle": "Follow-up Reminder",
+    "followUpBody": "You haven't responded to {{name}} yet.",
+    "weeklySummaryTitle": "Weekly Results",
+    "weeklySummaryBody": "You generated {{leads}} leads, {{bookings}} bookings, and ${{revenue}} in revenue this week."
   }
 }
