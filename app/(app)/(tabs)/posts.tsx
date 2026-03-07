@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSession } from '@/hooks/use-session';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { getPosts, type Post } from '@/lib/posts';
+import { getPosts, archivePost, unarchivePost, type Post } from '@/lib/posts';
 import { getLeads, type Lead } from '@/lib/leads';
 import { getEffectiveBookingUrl } from '@/lib/booking';
 
@@ -36,10 +36,13 @@ function truncateCaption(text: string): string {
   return t.slice(0, CAPTION_MAX).trim() + '…';
 }
 
+type PostFilter = 'active' | 'archive';
+
 export default function PostsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { user, profile } = useSession();
+  const [postFilter, setPostFilter] = useState<PostFilter>('active');
   const [posts, setPosts] = useState<Post[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,9 +52,10 @@ export default function PostsScreen() {
 
   const fetchData = useCallback(async () => {
     if (!user) return;
+    setLoading(true);
     try {
       const [postsData, leadsData] = await Promise.all([
-        getPosts(user.id),
+        getPosts(user.id, { archived: postFilter === 'archive' }),
         getLeads(user.id),
       ]);
       setPosts(postsData);
@@ -61,7 +65,7 @@ export default function PostsScreen() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, postFilter]);
 
   useFocusEffect(
     useCallback(() => {
@@ -78,6 +82,24 @@ export default function PostsScreen() {
       leads.filter((l) => l.source_post_id === postId).length,
     [leads],
   );
+
+  const handleArchive = useCallback(async (post: Post) => {
+    try {
+      await archivePost(post.id);
+      setPosts((prev) => prev.filter((p) => p.id !== post.id));
+    } catch {
+      // keep previous state
+    }
+  }, []);
+
+  const handleUnarchive = useCallback(async (post: Post) => {
+    try {
+      await unarchivePost(post.id);
+      setPosts((prev) => prev.filter((p) => p.id !== post.id));
+    } catch {
+      // keep previous state
+    }
+  }, []);
 
   const handleCopyLink = useCallback(async (postId: string) => {
     if (!user || !profile) return;
@@ -162,45 +184,113 @@ export default function PostsScreen() {
               </Text>
             </XStack>
           </XStack>
+          <Pressable
+            onPress={(e) => {
+              e?.stopPropagation?.();
+              if (postFilter === 'archive') {
+                handleUnarchive(post);
+              } else {
+                handleArchive(post);
+              }
+            }}
+          >
+            <XStack alignItems="center" gap="$1.5">
+              <Ionicons
+                name={postFilter === 'archive' ? 'arrow-undo-outline' : 'archive-outline'}
+                size={16}
+                color="#6B7280"
+              />
+              <Text fontSize={12} fontWeight="500" color="$brandTextLight">
+                {postFilter === 'archive' ? t('posts.unarchive') : t('posts.archive')}
+              </Text>
+            </XStack>
+          </Pressable>
         </Card>
       </Pressable>
     );
   };
 
-  if (loading) {
-    return (
-      <YStack flex={1} padding="$5" justifyContent="center" alignItems="center">
-        <Text color="$brandTextLight">{t('posts.loading')}</Text>
-      </YStack>
-    );
-  }
-
-  if (posts.length === 0) {
-    return (
-      <YStack flex={1} padding="$5" gap="$4" justifyContent="center">
-        <Text fontSize={18} fontWeight="600" color="$brandSecondary" textAlign="center">
-          {t('posts.emptyTitle')}
-        </Text>
-        <Text fontSize={14} color="$brandTextLight" textAlign="center">
-          {t('posts.emptyMessage')}
-        </Text>
-        <Button
-          variant="primary"
-          onPress={() => router.push('/(app)/generate-post')}
-        >
-          {t('posts.generateFirst')}
-        </Button>
-      </YStack>
-    );
-  }
+  const emptyMessage =
+    postFilter === 'archive'
+      ? t('posts.archivedEmpty')
+      : t('posts.emptyMessage');
+  const emptyTitle =
+    postFilter === 'archive'
+      ? t('posts.archivedEmptyTitle')
+      : t('posts.emptyTitle');
 
   return (
-    <FlatList
-      data={posts}
-      keyExtractor={(item) => item.id}
-      renderItem={renderItem}
-      contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
-      ItemSeparatorComponent={() => <YStack height={12} />}
-    />
+    <YStack flex={1}>
+      {/* Active | Archive segment */}
+      <XStack paddingHorizontal="$4" paddingTop="$3" paddingBottom="$2" gap="$2">
+        <Pressable onPress={() => setPostFilter('active')}>
+          <XStack
+            paddingHorizontal="$3"
+            paddingVertical="$2"
+            borderRadius={20}
+            backgroundColor={postFilter === 'active' ? '$brandPrimary' : '$brandBackground'}
+            borderWidth={postFilter === 'active' ? 0 : 1}
+            borderColor="$brandBorder"
+          >
+            <Text
+              fontSize={13}
+              fontWeight={postFilter === 'active' ? '600' : '400'}
+              color={postFilter === 'active' ? '$brandTextInverse' : '$brandTextLight'}
+            >
+              {t('posts.active')}
+            </Text>
+          </XStack>
+        </Pressable>
+        <Pressable onPress={() => setPostFilter('archive')}>
+          <XStack
+            paddingHorizontal="$3"
+            paddingVertical="$2"
+            borderRadius={20}
+            backgroundColor={postFilter === 'archive' ? '$brandPrimary' : '$brandBackground'}
+            borderWidth={postFilter === 'archive' ? 0 : 1}
+            borderColor="$brandBorder"
+          >
+            <Text
+              fontSize={13}
+              fontWeight={postFilter === 'archive' ? '600' : '400'}
+              color={postFilter === 'archive' ? '$brandTextInverse' : '$brandTextLight'}
+            >
+              {t('posts.archive')}
+            </Text>
+          </XStack>
+        </Pressable>
+      </XStack>
+
+      {loading ? (
+        <YStack flex={1} padding="$5" justifyContent="center" alignItems="center">
+          <Text color="$brandTextLight">{t('posts.loading')}</Text>
+        </YStack>
+      ) : posts.length === 0 ? (
+        <YStack flex={1} padding="$5" gap="$4" justifyContent="center">
+          <Text fontSize={18} fontWeight="600" color="$brandSecondary" textAlign="center">
+            {emptyTitle}
+          </Text>
+          <Text fontSize={14} color="$brandTextLight" textAlign="center">
+            {emptyMessage}
+          </Text>
+          {postFilter === 'active' && (
+            <Button
+              variant="primary"
+              onPress={() => router.push('/(app)/generate-post')}
+            >
+              {t('posts.generateFirst')}
+            </Button>
+          )}
+        </YStack>
+      ) : (
+        <FlatList
+          data={posts}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+          ItemSeparatorComponent={() => <YStack height={12} />}
+        />
+      )}
+    </YStack>
   );
 }

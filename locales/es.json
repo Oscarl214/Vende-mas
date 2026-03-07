@@ -254,6 +254,10 @@
     "shareFormMessage": "Comparte este enlace para recibir leads:",
     "formLinkCopied": "Enlace copiado",
     "leadCount": "{{count}} leads",
+    "deleteLead": "Eliminar lead",
+    "confirmDeleteTitle": "¿Eliminar lead?",
+    "confirmDeleteMessage": "Se eliminará permanentemente a {{name}} de tus leads.",
+    "thisLead": "este lead",
     "timeAgo": {
       "now": "ahora",
       "minutes": "hace {{count}}m",
@@ -299,7 +303,8 @@
     "revenueLabel": "Ingreso",
     "revenuePlaceholder": "Monto ganado",
     "revenueSaved": "Guardado",
-    "saveRevenue": "Guardar"
+    "saveRevenue": "Guardar",
+    "deleteLead": "Eliminar lead"
   },
   "settings": {
     "editBusiness": "Editar negocio",
@@ -441,7 +446,12 @@
     "leads": "{{count}} leads",
     "emptyTitle": "Aún no hay posts",
     "emptyMessage": "Genera un post para obtener un enlace de seguimiento y ver clics y leads aquí.",
-    "generateFirst": "Genera tu primer post"
+    "generateFirst": "Genera tu primer post",
+    "active": "Activos",
+    "archive": "Archivo",
+    "archivedEmptyTitle": "No hay posts archivados",
+    "archivedEmpty": "Los posts archivados aparecerán aquí cuando los archives desde la lista Activos.",
+    "unarchive": "Desarchivar"
   },
   "postDetail": {
     "title": "Rendimiento del Post",
@@ -455,7 +465,11 @@
     "noLeads": "Aún no hay leads de este post.",
     "clicks": "Clics",
     "leads": "Leads",
-    "revenue": "Ingreso"
+    "revenue": "Ingreso",
+    "archive": "Archivar",
+    "unarchive": "Desarchivar",
+    "confirmArchiveTitle": "¿Archivar este post?",
+    "confirmArchiveMessage": "Puedes restaurarlo desde la pestaña Archivo en cualquier momento."
   },
   "notifications": {
     "newLeadTitle": "Nuevo Lead",

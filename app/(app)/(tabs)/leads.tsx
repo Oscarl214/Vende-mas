@@ -21,6 +21,7 @@ import { supabase } from '@/lib/supabase';
 import {
   getLeads,
   createLead,
+  deleteLead,
   leadNeedsFollowUp,
   daysSince,
   type Lead,
@@ -152,6 +153,22 @@ export default function LeadsScreen() {
           );
         },
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'leads',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const oldRow = payload.old as { id: string };
+          if (oldRow?.id) {
+            setLeads((prev) => prev.filter((l) => l.id !== oldRow.id));
+            refreshUsage();
+          }
+        },
+      )
       .subscribe();
 
     return () => {
@@ -189,6 +206,29 @@ export default function LeadsScreen() {
     } catch {
       // cancelled
     }
+  };
+
+  const handleDeleteLead = (lead: Lead) => {
+    Alert.alert(
+      t('leads.confirmDeleteTitle'),
+      t('leads.confirmDeleteMessage', { name: lead.name ?? t('leads.thisLead') }),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('leads.deleteLead'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteLead(lead.id);
+              setLeads((prev) => prev.filter((l) => l.id !== lead.id));
+              refreshUsage();
+            } catch (error: any) {
+              Alert.alert(t('common.error'), error.message);
+            }
+          },
+        },
+      ],
+    );
   };
 
   const handleAddLead = async () => {
@@ -263,19 +303,30 @@ export default function LeadsScreen() {
               )}
             </YStack>
             <YStack alignItems="flex-end" gap="$1">
-              <XStack
-                paddingHorizontal="$2"
-                paddingVertical="$1"
-                borderRadius={6}
-                backgroundColor={STATUS_COLORS[item.status] + '18'}
-              >
-                <Text
-                  fontSize={11}
-                  fontWeight="600"
-                  color={STATUS_COLORS[item.status]}
+              <XStack alignItems="center" gap="$2">
+                <Pressable
+                  onPress={(e) => {
+                    e?.stopPropagation?.();
+                    handleDeleteLead(item);
+                  }}
+                  hitSlop={8}
                 >
-                  {t(`leads.status${item.status.charAt(0).toUpperCase() + item.status.slice(1)}`)}
-                </Text>
+                  <Ionicons name="trash-outline" size={20} color="#B91C1C" />
+                </Pressable>
+                <XStack
+                  paddingHorizontal="$2"
+                  paddingVertical="$1"
+                  borderRadius={6}
+                  backgroundColor={STATUS_COLORS[item.status] + '18'}
+                >
+                  <Text
+                    fontSize={11}
+                    fontWeight="600"
+                    color={STATUS_COLORS[item.status]}
+                  >
+                    {t(`leads.status${item.status.charAt(0).toUpperCase() + item.status.slice(1)}`)}
+                  </Text>
+                </XStack>
               </XStack>
               <Text fontSize={11} color="$brandTextLight">
                 {timeAgo(item.created_at, t)}

@@ -61,3 +61,10 @@ export async function incrementLeadCount(userId: string): Promise<void> {
   });
   if (error) throw error;
 }
+
+export async function decrementLeadCount(userId: string): Promise<void> {
+  const { error } = await supabase.rpc('decrement_lead_count', {
+    p_user_id: userId,
+  });
+  if (error) throw error;
+}

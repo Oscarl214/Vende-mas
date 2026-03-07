@@ -254,6 +254,10 @@
     "shareFormMessage": "Share this link to receive leads:",
     "formLinkCopied": "Link copied",
     "leadCount": "{{count}} leads",
+    "deleteLead": "Delete lead",
+    "confirmDeleteTitle": "Delete lead?",
+    "confirmDeleteMessage": "This will permanently remove {{name}} from your leads.",
+    "thisLead": "this lead",
     "timeAgo": {
       "now": "now",
       "minutes": "{{count}}m ago",
@@ -299,7 +303,8 @@
     "revenueLabel": "Revenue",
     "revenuePlaceholder": "Amount earned",
     "revenueSaved": "Saved",
-    "saveRevenue": "Save"
+    "saveRevenue": "Save",
+    "deleteLead": "Delete lead"
   },
   "settings": {
     "editBusiness": "Edit business",
@@ -441,7 +446,12 @@
     "leads": "{{count}} leads",
     "emptyTitle": "No posts yet",
     "emptyMessage": "Generate a post to get a tracking link and see clicks and leads here.",
-    "generateFirst": "Generate your first post"
+    "generateFirst": "Generate your first post",
+    "active": "Active",
+    "archive": "Archive",
+    "archivedEmptyTitle": "No archived posts",
+    "archivedEmpty": "Archived posts will appear here when you archive them from the Active list.",
+    "unarchive": "Unarchive"
   },
   "postDetail": {
     "title": "Post Performance",
@@ -455,7 +465,11 @@
     "noLeads": "No leads from this post yet.",
     "clicks": "Clicks",
     "leads": "Leads",
-    "revenue": "Revenue"
+    "revenue": "Revenue",
+    "archive": "Archive",
+    "unarchive": "Unarchive",
+    "confirmArchiveTitle": "Archive this post?",
+    "confirmArchiveMessage": "You can restore it from the Archive tab anytime."
   },
   "notifications": {
     "newLeadTitle": "New Lead",

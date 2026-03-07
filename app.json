@@ -9,7 +9,12 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "Allow VendeMas to use speech recognition.",
+        "NSMicrophoneUsageDescription": "Allow VendeMas to use your microphone for voice input."
+      },
+      "bundleIdentifier": "com.anonymous.vendemas"
     },
     "android": {
       "adaptiveIcon": {
@@ -59,10 +64,13 @@
           "color": "#0F766E"
         }
       ],
-      ["expo-speech-recognition", {
-        "microphonePermission": "Allow VendeMas to use your microphone for voice input.",
-        "speechRecognitionPermission": "Allow VendeMas to use speech recognition."
-      }]
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow VendeMas to use your microphone for voice input.",
+          "speechRecognitionPermission": "Allow VendeMas to use speech recognition."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

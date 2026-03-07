@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, ScrollView } from 'react-native';
+import { Alert, Pressable, ScrollView } from 'react-native';
 import { YStack, Text, XStack } from 'tamagui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import * as Clipboard from 'expo-clipboard';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/hooks/use-session';
-import { getPost, type Post } from '@/lib/posts';
+import { getPost, archivePost, unarchivePost, type Post } from '@/lib/posts';
 import { getLeadsByPost, type Lead, type LeadStatus } from '@/lib/leads';
 import { getEffectiveBookingUrl } from '@/lib/booking';
 
@@ -276,6 +276,53 @@ export default function PostDetailScreen() {
             </Pressable>
           </YStack>
         ) : null}
+
+        {/* Archive / Unarchive */}
+        <YStack gap="$2">
+          <Button
+            variant="outline"
+            onPress={async () => {
+              if (!post) return;
+              const isArchived = !!post.archived_at;
+              if (isArchived) {
+                try {
+                  const updated = await unarchivePost(post.id);
+                  setPost(updated);
+                } catch {
+                  // keep state
+                }
+              } else {
+                Alert.alert(
+                  t('postDetail.confirmArchiveTitle'),
+                  t('postDetail.confirmArchiveMessage'),
+                  [
+                    { text: t('common.cancel'), style: 'cancel' },
+                    {
+                      text: t('postDetail.archive'),
+                      onPress: async () => {
+                        try {
+                          const updated = await archivePost(post.id);
+                          setPost(updated);
+                        } catch {
+                          // keep state
+                        }
+                      },
+                    },
+                  ],
+                );
+              }
+            }}
+            icon={
+              <Ionicons
+                name={post.archived_at ? 'arrow-undo-outline' : 'archive-outline'}
+                size={18}
+                color="#6B7280"
+              />
+            }
+          >
+            {post.archived_at ? t('postDetail.unarchive') : t('postDetail.archive')}
+          </Button>
+        </YStack>
 
         {/* Leads attracted */}
         <YStack gap="$2">

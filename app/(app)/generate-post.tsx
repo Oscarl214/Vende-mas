@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Alert,
   Keyboard,
@@ -17,7 +17,6 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InputField } from '@/components/ui/input';
-import { VoiceInputButton } from '@/components/ui/voice-input-button';
 import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
 import { generateContent } from '@/lib/ai';
@@ -41,12 +40,26 @@ const PLATFORM_ICONS: Record<string, string> = {
   google_business: 'business',
 };
 
+type VoiceInputButtonComponent = React.ComponentType<{
+  onTranscript: (text: string) => void;
+  lang?: string;
+  size?: number;
+}>;
+
 export default function GeneratePostScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { user, profile } = useSession();
   const { canGeneratePost, refreshUsage } = useSubscription();
+  const [VoiceInputButton, setVoiceInputButton] =
+    useState<VoiceInputButtonComponent | null>(null);
+
+  useEffect(() => {
+    import('@/components/ui/voice-input-button')
+      .then((m) => setVoiceInputButton(() => m.VoiceInputButton))
+      .catch(() => setVoiceInputButton(null));
+  }, []);
 
   const [goal, setGoal] = useState('');
   const [platform, setPlatform] = useState('');
@@ -303,12 +316,14 @@ export default function GeneratePostScreen() {
                       onSubmitEditing={() => Keyboard.dismiss()}
                     />
                   </YStack>
-                  <VoiceInputButton
-                    onTranscript={(text) =>
-                      setPromotionDetails((prev) => (prev ? `${prev} ${text}` : text))
-                    }
-                    lang={profile?.default_language === 'es' ? 'es-MX' : 'en-US'}
-                  />
+                  {VoiceInputButton && (
+                    <VoiceInputButton
+                      onTranscript={(text) =>
+                        setPromotionDetails((prev) => (prev ? `${prev} ${text}` : text))
+                      }
+                      lang={profile?.default_language === 'es' ? 'es-MX' : 'en-US'}
+                    />
+                  )}
                 </XStack>
 
                 {/* Length selector */}
