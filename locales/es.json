@@ -417,7 +417,10 @@
     "lengthMedium": "Medio (~250)",
     "lengthLong": "Largo (~500)",
     "limitReached": "Límite alcanzado",
-    "limitMessage": "Llegaste al límite de posts gratis este mes."
+    "limitMessage": "Llegaste al límite de posts gratis este mes.",
+    "voiceListening": "Escuchando...",
+    "voiceTapToSpeak": "Toca para hablar",
+    "micPermissionDenied": "Se requiere permiso del micrófono para entrada de voz."
   },
   "tiers": {
     "free": "Gratis",

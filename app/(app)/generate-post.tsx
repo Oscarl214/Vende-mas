@@ -17,6 +17,7 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InputField } from '@/components/ui/input';
+import { VoiceInputButton } from '@/components/ui/voice-input-button';
 import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
 import { generateContent } from '@/lib/ai';
@@ -287,18 +288,28 @@ export default function GeneratePostScreen() {
                 </YStack>
 
                 {/* Promotion Details */}
-                <InputField
-                  label={t('contentEngine.promotionLabel')}
-                  placeholder={t('contentEngine.promotionPlaceholder')}
-                  multiline
-                  numberOfLines={3}
-                  textAlignVertical="top"
-                  onChangeText={setPromotionDetails}
-                  value={promotionDetails}
-                  returnKeyType="done"
-                  blurOnSubmit
-                  onSubmitEditing={() => Keyboard.dismiss()}
-                />
+                <XStack gap="$2" alignItems="flex-end">
+                  <YStack flex={1}>
+                    <InputField
+                      label={t('contentEngine.promotionLabel')}
+                      placeholder={t('contentEngine.promotionPlaceholder')}
+                      multiline
+                      numberOfLines={3}
+                      textAlignVertical="top"
+                      onChangeText={setPromotionDetails}
+                      value={promotionDetails}
+                      returnKeyType="done"
+                      blurOnSubmit
+                      onSubmitEditing={() => Keyboard.dismiss()}
+                    />
+                  </YStack>
+                  <VoiceInputButton
+                    onTranscript={(text) =>
+                      setPromotionDetails((prev) => (prev ? `${prev} ${text}` : text))
+                    }
+                    lang={profile?.default_language === 'es' ? 'es-MX' : 'en-US'}
+                  />
+                </XStack>
 
                 {/* Length selector */}
                 <YStack gap="$1.5">

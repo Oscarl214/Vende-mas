@@ -19,7 +19,11 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anonymous.vendemas"
     },
     "web": {
       "output": "static",
@@ -54,7 +58,11 @@
           "icon": "./assets/images/icon.png",
           "color": "#0F766E"
         }
-      ]
+      ],
+      ["expo-speech-recognition", {
+        "microphonePermission": "Allow VendeMas to use your microphone for voice input.",
+        "speechRecognitionPermission": "Allow VendeMas to use speech recognition."
+      }]
     ],
     "experiments": {
       "typedRoutes": true,
