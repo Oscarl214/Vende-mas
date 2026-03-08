@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { decrementLeadCount } from './usage';
 
 export type LeadStatus = 'new' | 'contacted' | 'booked' | 'closed';
 
@@ -108,4 +109,21 @@ export async function updateLeadRevenue(leadId: string, revenue: number | null) 
     .single();
   if (error) throw error;
   return data as Lead;
+}
+
+export async function deleteLead(leadId: string) {
+  const { data: lead, error: fetchError } = await supabase
+    .from('leads')
+    .select('user_id')
+    .eq('id', leadId)
+    .single();
+  if (fetchError || !lead) throw fetchError || new Error('Lead not found');
+
+  const { error: deleteError } = await supabase
+    .from('leads')
+    .delete()
+    .eq('id', leadId);
+  if (deleteError) throw deleteError;
+
+  await decrementLeadCount(lead.user_id);
 }

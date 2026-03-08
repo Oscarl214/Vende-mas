@@ -13,7 +13,7 @@ import { InputField } from '@/components/ui/input';
 import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
 import { TIERS } from '@/constants/tiers';
-import { getLeads, updateLeadStatus, updateLeadRevenue, type Lead, type LeadStatus } from '@/lib/leads';
+import { getLeads, updateLeadStatus, updateLeadRevenue, deleteLead, type Lead, type LeadStatus } from '@/lib/leads';
 import { getPost, type Post } from '@/lib/posts';
 import { generateFollowUp } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
@@ -684,6 +684,37 @@ export default function LeadDetailScreen() {
               )}
             </YStack>
           )}
+        </YStack>
+
+        {/* Delete lead */}
+        <YStack marginTop="$4" paddingTop="$4" borderTopWidth={1} borderColor="$brandBorder">
+          <Button
+            variant="outline"
+            onPress={() => {
+              Alert.alert(
+                t('leads.confirmDeleteTitle'),
+                t('leads.confirmDeleteMessage', { name: lead.name ?? t('leads.thisLead') }),
+                [
+                  { text: t('common.cancel'), style: 'cancel' },
+                  {
+                    text: t('leadDetail.deleteLead'),
+                    style: 'destructive',
+                    onPress: async () => {
+                      try {
+                        await deleteLead(lead.id);
+                        router.back();
+                      } catch (error: any) {
+                        Alert.alert(t('common.error'), error.message);
+                      }
+                    },
+                  },
+                ],
+              );
+            }}
+            icon={<Ionicons name="trash-outline" size={18} color="#B91C1C" />}
+          >
+            {t('leadDetail.deleteLead')}
+          </Button>
         </YStack>
       </YStack>
     </ScrollView>
