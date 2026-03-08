@@ -6,9 +6,10 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  Share,
 } from 'react-native';
 import { YStack, Text, XStack, Sheet } from 'tamagui';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -23,6 +24,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { generateContent } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
 import { createPost } from '@/lib/posts';
+import { markOnboardingSeen, markMilestone } from '@/lib/onboarding';
 
 const GOAL_KEYS = [
   'awareness',
@@ -47,13 +49,18 @@ export default function GeneratePostScreen() {
   const { t } = useTranslation();
   const { user, profile } = useSession();
   const { canGeneratePost, refreshUsage } = useSubscription();
+  const { onboarding } = useLocalSearchParams<{ onboarding?: string }>();
+  const isOnboarding = onboarding === 'true';
 
-  const [goal, setGoal] = useState('');
-  const [platform, setPlatform] = useState('');
-  const [promotionDetails, setPromotionDetails] = useState('');
+  const [goal, setGoal] = useState(isOnboarding ? 'promotion' : '');
+  const [platform, setPlatform] = useState(isOnboarding ? 'facebook' : '');
+  const [promotionDetails, setPromotionDetails] = useState(
+    isOnboarding ? t('onboarding.defaultPromotion') : '',
+  );
   const [maxLength, setMaxLength] = useState<string>('auto');
   const [goalSheetOpen, setGoalSheetOpen] = useState(false);
   const [platformSheetOpen, setPlatformSheetOpen] = useState(false);
+  const [successSheetOpen, setSuccessSheetOpen] = useState(false);
 
   const LENGTH_OPTIONS = [
     { key: 'auto', label: t('contentEngine.lengthAuto') },
@@ -125,6 +132,9 @@ export default function GeneratePostScreen() {
         });
         setSavedPostId(post.id);
         await refreshUsage();
+        if (isOnboarding) {
+          await markMilestone('first_post_created');
+        }
       }
     } catch (error: any) {
       Alert.alert(t('common.error'), error.message);
@@ -137,6 +147,10 @@ export default function GeneratePostScreen() {
     await Clipboard.setStringAsync(generatedCaption);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    if (isOnboarding) {
+      await markMilestone('first_post_shared');
+      setSuccessSheetOpen(true);
+    }
   };
 
   const handleCopyWithLink = async () => {
@@ -144,6 +158,29 @@ export default function GeneratePostScreen() {
     await Clipboard.setStringAsync(text);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
+    if (isOnboarding) {
+      await markMilestone('first_post_shared');
+      setSuccessSheetOpen(true);
+    }
+  };
+
+  const handleShare = async () => {
+    const text = formUrl
+      ? `${generatedCaption}\n\n${formUrl}`
+      : generatedCaption;
+    try {
+      await Share.share({ message: text });
+      if (isOnboarding) {
+        await markMilestone('first_post_shared');
+        setSuccessSheetOpen(true);
+      }
+    } catch {}
+  };
+
+  const handleGoToDashboard = async () => {
+    setSuccessSheetOpen(false);
+    await markOnboardingSeen();
+    router.replace('/(app)/(tabs)');
   };
 
   return (
@@ -288,6 +325,11 @@ export default function GeneratePostScreen() {
                 </YStack>
 
                 {/* Promotion Details */}
+                {isOnboarding && (
+                  <Text fontSize={13} color="$brandTextLight" fontStyle="italic">
+                    {t('onboarding.guidedPromptHint')}
+                  </Text>
+                )}
                 <XStack gap="$2" alignItems="flex-end">
                   <YStack flex={1}>
                     <InputField
@@ -355,7 +397,7 @@ export default function GeneratePostScreen() {
                   }
                 >
                   {generating
-                    ? t('contentEngine.generating')
+                    ? (isOnboarding ? t('onboarding.creatingPost') : t('contentEngine.generating'))
                     : t('contentEngine.generate')}
                 </Button>
               </YStack>
@@ -365,7 +407,9 @@ export default function GeneratePostScreen() {
               <YStack gap="$4">
                 <YStack gap="$1">
                   <Text fontSize={22} fontWeight="bold" color="$brandSecondary">
-                    {t('contentEngine.resultTitle')}
+                    {isOnboarding
+                      ? `✨ ${t('onboarding.postReady')}`
+                      : t('contentEngine.resultTitle')}
                   </Text>
                   <XStack gap="$2" alignItems="center">
                     <Ionicons
@@ -390,100 +434,175 @@ export default function GeneratePostScreen() {
                   >
                     {generatedCaption}
                   </Text>
-                  <XStack justifyContent="flex-end">
-                    <Pressable onPress={handleCopyCaption}>
-                      <XStack alignItems="center" gap="$1.5" paddingVertical="$1">
+                  {formUrl.length > 0 && savedPostId != null && (
+                    <Text fontSize={13} color="$brandPrimary" selectable>
+                      {formUrl}
+                    </Text>
+                  )}
+                  {!isOnboarding && (
+                    <XStack justifyContent="flex-end">
+                      <Pressable onPress={handleCopyCaption}>
+                        <XStack alignItems="center" gap="$1.5" paddingVertical="$1">
+                          <Ionicons
+                            name={copied ? 'checkmark-circle' : 'copy-outline'}
+                            size={18}
+                            color={copied ? '#16A34A' : '#0F766E'}
+                          />
+                          <Text
+                            fontSize={13}
+                            fontWeight="500"
+                            color={copied ? '$brandSuccess' : '$brandPrimary'}
+                          >
+                            {copied
+                              ? t('contentEngine.copied')
+                              : t('contentEngine.copy')}
+                          </Text>
+                        </XStack>
+                      </Pressable>
+                    </XStack>
+                  )}
+                </Card>
+
+                {isOnboarding ? (
+                  <XStack gap="$3">
+                    <Button
+                      variant="outline"
+                      onPress={handleCopyCaption}
+                      flex={1}
+                      icon={
                         <Ionicons
                           name={copied ? 'checkmark-circle' : 'copy-outline'}
                           size={18}
                           color={copied ? '#16A34A' : '#0F766E'}
                         />
-                        <Text
-                          fontSize={13}
-                          fontWeight="500"
-                          color={copied ? '$brandSuccess' : '$brandPrimary'}
-                        >
-                          {copied
-                            ? t('contentEngine.copied')
-                            : t('contentEngine.copy')}
-                        </Text>
-                      </XStack>
-                    </Pressable>
-                  </XStack>
-                </Card>
-
-                {/* Lead form link – only show when post was saved so the URL includes ?post= for tracking */}
-                {formUrl.length > 0 && savedPostId != null && (
-                  <Card variant="outlined" padding="$3.5" gap="$2.5">
-                    <XStack alignItems="center" gap="$2">
-                      <Ionicons name="link" size={18} color="#0F766E" />
-                      <Text fontSize={14} fontWeight="600" color="$brandSecondary">
-                        {t('contentEngine.leadFormLink')}
-                      </Text>
-                    </XStack>
-                    <Text
-                      fontSize={12}
-                      color="$brandTextLight"
-                      lineHeight={18}
-                    >
-                      {t('contentEngine.leadFormHint')}
-                    </Text>
-                    <Card variant="flat" padding="$2.5" borderRadius={8}>
-                      <Text
-                        fontSize={12}
-                        color="$brandPrimary"
-                        numberOfLines={2}
-                        selectable
-                      >
-                        {formUrl}
-                      </Text>
-                    </Card>
-                    <Button
-                      variant="primary"
-                      height={44}
-                      onPress={handleCopyWithLink}
-                      icon={
-                        <Ionicons
-                          name={copiedLink ? 'checkmark-circle' : 'clipboard-outline'}
-                          size={18}
-                          color="#fff"
-                        />
                       }
                     >
-                      {copiedLink
+                      {copied
                         ? t('contentEngine.copied')
-                        : t('contentEngine.copyWithLink')}
+                        : t('onboarding.copyPost')}
                     </Button>
-                  </Card>
-                )}
+                    <Button
+                      variant="primary"
+                      onPress={handleShare}
+                      flex={1}
+                      icon={
+                        <Ionicons name="share-outline" size={18} color="#fff" />
+                      }
+                    >
+                      {t('onboarding.sharePost')}
+                    </Button>
+                  </XStack>
+                ) : (
+                  <>
+                    {/* Lead form link */}
+                    {formUrl.length > 0 && savedPostId != null && (
+                      <Card variant="outlined" padding="$3.5" gap="$2.5">
+                        <XStack alignItems="center" gap="$2">
+                          <Ionicons name="link" size={18} color="#0F766E" />
+                          <Text fontSize={14} fontWeight="600" color="$brandSecondary">
+                            {t('contentEngine.leadFormLink')}
+                          </Text>
+                        </XStack>
+                        <Text
+                          fontSize={12}
+                          color="$brandTextLight"
+                          lineHeight={18}
+                        >
+                          {t('contentEngine.leadFormHint')}
+                        </Text>
+                        <Card variant="flat" padding="$2.5" borderRadius={8}>
+                          <Text
+                            fontSize={12}
+                            color="$brandPrimary"
+                            numberOfLines={2}
+                            selectable
+                          >
+                            {formUrl}
+                          </Text>
+                        </Card>
+                        <Button
+                          variant="primary"
+                          height={44}
+                          onPress={handleCopyWithLink}
+                          icon={
+                            <Ionicons
+                              name={copiedLink ? 'checkmark-circle' : 'clipboard-outline'}
+                              size={18}
+                              color="#fff"
+                            />
+                          }
+                        >
+                          {copiedLink
+                            ? t('contentEngine.copied')
+                            : t('contentEngine.copyWithLink')}
+                        </Button>
+                      </Card>
+                    )}
 
-                <XStack gap="$3">
-                  <Button
-                    variant="outline"
-                    onPress={handleGenerate}
-                    disabled={generating}
-                    flex={1}
-                    icon={
-                      <Ionicons name="refresh" size={18} color="#0F766E" />
-                    }
-                  >
-                    {generating
-                      ? t('contentEngine.generating')
-                      : t('contentEngine.regenerate')}
-                  </Button>
-                  <Button
-                    variant="primary"
-                    onPress={() => router.back()}
-                    flex={1}
-                  >
-                    {t('contentEngine.done')}
-                  </Button>
-                </XStack>
+                    <XStack gap="$3">
+                      <Button
+                        variant="outline"
+                        onPress={handleGenerate}
+                        disabled={generating}
+                        flex={1}
+                        icon={
+                          <Ionicons name="refresh" size={18} color="#0F766E" />
+                        }
+                      >
+                        {generating
+                          ? t('contentEngine.generating')
+                          : t('contentEngine.regenerate')}
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onPress={() => router.back()}
+                        flex={1}
+                      >
+                        {t('contentEngine.done')}
+                      </Button>
+                    </XStack>
+                  </>
+                )}
               </YStack>
             </Animated.View>
           )}
         </YStack>
       </ScrollView>
+
+      {/* Onboarding success reinforcement */}
+      <Sheet
+        open={successSheetOpen}
+        onOpenChange={setSuccessSheetOpen}
+        modal
+        snapPointsMode="fit"
+        dismissOnSnapToBottom={false}
+      >
+        <Sheet.Frame padding="$5">
+          <YStack alignItems="center" gap="$4" paddingVertical="$3">
+            <Text fontSize={40}>🎉</Text>
+            <Text fontSize={24} fontWeight="bold" color="$brandSecondary" textAlign="center">
+              {t('onboarding.successTitle')}
+            </Text>
+            <Text
+              fontSize={15}
+              color="$brandTextLight"
+              textAlign="center"
+              lineHeight={22}
+            >
+              {t('onboarding.successMessage')}
+            </Text>
+            <Button
+              variant="primary"
+              width="100%"
+              marginTop="$2"
+              onPress={handleGoToDashboard}
+            >
+              {t('onboarding.goToDashboard')}
+            </Button>
+          </YStack>
+        </Sheet.Frame>
+        <Sheet.Overlay />
+      </Sheet>
     </KeyboardAvoidingView>
   );
 }

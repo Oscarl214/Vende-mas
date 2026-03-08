@@ -10,6 +10,7 @@ import { SubscriptionProvider } from '@/providers/subscription-provider';
 import { NotificationProvider } from '@/providers/notification-provider';
 import { LanguageProvider } from '@/providers/language-provider';
 import { useSession } from '@/hooks/use-session';
+import { hasSeenOnboarding } from '@/lib/onboarding';
 import { ActivityIndicator, View } from 'react-native';
 import 'react-native-reanimated';
 
@@ -21,22 +22,38 @@ function AuthGate() {
   useEffect(() => {
     if (loading) return;
 
-    const inAuthGroup = segments[0] === '(auth)';
-    const inAppGroup = segments[0] === '(app)';
-    const needsProfile = session && (!profile || !profile.profile_complete);
+    const navigate = async () => {
+      const inAuthGroup = segments[0] === '(auth)';
+      const inAppGroup = segments[0] === '(app)';
+      const needsProfile = session && (!profile || !profile.profile_complete);
 
-    if (!session && !inAuthGroup) {
-      router.replace('/(auth)/welcome');
-    } else if (session && inAuthGroup) {
-      if (needsProfile) {
+      if (!session && !inAuthGroup) {
+        router.replace('/(auth)/welcome');
+      } else if (session && inAuthGroup) {
+        if (needsProfile) {
+          router.replace('/(app)/profile-setup');
+        } else {
+          const seen = await hasSeenOnboarding();
+          if (!seen) {
+            router.replace('/(app)/onboarding');
+          } else {
+            router.replace('/(app)/(tabs)');
+          }
+        }
+      } else if (needsProfile && inAppGroup) {
         router.replace('/(app)/profile-setup');
-      } else {
-        router.replace('/(app)/(tabs)');
+      } else if (session && profile?.profile_complete && inAppGroup) {
+        const currentScreen = segments[1];
+        if (currentScreen !== 'onboarding' && currentScreen !== 'generate-post') {
+          const seen = await hasSeenOnboarding();
+          if (!seen) {
+            router.replace('/(app)/onboarding');
+          }
+        }
       }
-    } else if (needsProfile && inAppGroup) {
-      // User is signed in but profile missing or incomplete (e.g. new account or DB reset)
-      router.replace('/(app)/profile-setup');
-    }
+    };
+
+    navigate();
   }, [session, profile, loading, segments]);
 
   if (loading) {
@@ -51,9 +68,6 @@ function AuthGate() {
 }
 
 export default function RootLayout() {
-  // #region agent log
-  fetch('http://127.0.0.1:7243/ingest/3ad822b0-6755-45d8-890c-0aaaa8147adc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'_layout.tsx:RootLayout',message:'RootLayout rendering with PortalProvider',data:{hasPortalProvider:true},timestamp:Date.now(),hypothesisId:'H1,H3'})}).catch(()=>{});
-  // #endregion
   return (
     <LanguageProvider>
       <TamaguiProvider config={config} defaultTheme="light">

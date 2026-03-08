@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { YStack, Text, XStack } from 'tamagui';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
+import { getGrowthChecklist, isChecklistComplete, type GrowthChecklist } from '@/lib/onboarding';
 
 function UsageBar({
   label,
@@ -47,6 +48,13 @@ function UsageBar({
   );
 }
 
+const MILESTONES: { key: keyof GrowthChecklist; labelKey: string }[] = [
+  { key: 'first_post_created', labelKey: 'onboarding.milestonePostCreated' },
+  { key: 'first_post_shared', labelKey: 'onboarding.milestonePostShared' },
+  { key: 'first_lead', labelKey: 'onboarding.milestoneFirstLead' },
+  { key: 'first_booking_closed', labelKey: 'onboarding.milestoneFirstBooking' },
+];
+
 export default function DashboardScreen() {
   const { profile } = useSession();
   const { tier, usage, refreshUsage } = useSubscription();
@@ -55,10 +63,13 @@ export default function DashboardScreen() {
   const { t } = useTranslation();
   const limits = TIERS[tier];
   const proPrice = t('tiers.proPrice');
+  const [checklist, setChecklist] = useState<GrowthChecklist | null>(null);
+  const showChecklist = checklist !== null && !isChecklistComplete(checklist);
 
   useFocusEffect(
     useCallback(() => {
       refreshUsage();
+      getGrowthChecklist().then(setChecklist);
     }, [refreshUsage]),
   );
 
@@ -91,6 +102,33 @@ export default function DashboardScreen() {
             </Text>
           </XStack>
         </XStack>
+
+        {showChecklist && (
+          <Card variant="outlined" gap="$3">
+            <Text fontSize={15} fontWeight="600" color="$brandSecondary">
+              {t('onboarding.growthSetup')}
+            </Text>
+            {MILESTONES.map(({ key, labelKey }) => {
+              const done = checklist[key];
+              return (
+                <XStack key={key} alignItems="center" gap="$2.5">
+                  <Ionicons
+                    name={done ? 'checkmark-circle' : 'ellipse-outline'}
+                    size={20}
+                    color={done ? '#16A34A' : '#D1D5DB'}
+                  />
+                  <Text
+                    fontSize={14}
+                    color={done ? '$brandText' : '$brandTextLight'}
+                    fontWeight={done ? '500' : '400'}
+                  >
+                    {t(labelKey)}
+                  </Text>
+                </XStack>
+              );
+            })}
+          </Card>
+        )}
 
         {tier === 'free' && (
           <Pressable onPress={() => router.push('/(app)/paywall')}>

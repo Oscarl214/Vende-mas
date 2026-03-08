@@ -287,7 +287,7 @@ export default function ProfileSetupScreen() {
       if (isEditing) {
         router.back();
       } else {
-        router.replace('/(app)/(tabs)');
+        router.replace('/(app)/onboarding');
       }
     } catch (error: any) {
       Alert.alert(t('common.error'), error.message);

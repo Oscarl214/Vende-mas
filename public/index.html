@@ -29,11 +29,27 @@
   .success-text { text-align: center; font-size: 16px; line-height: 1.5; }
   .redirect-text { text-align: center; font-size: 13px; color: #6B7280; margin-top: 12px; }
   .redirect-text a { color: #0F766E; text-decoration: underline; }
-  .powered { text-align: center; margin-top: 20px; font-size: 12px; color: #9CA3AF; }
   .hidden { display: none; }
   .loading-spinner { text-align: center; padding: 60px 0; }
   .loading-spinner::after { content: ''; display: inline-block; width: 32px; height: 32px; border: 3px solid #E5E7EB; border-top-color: #0F766E; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  .powered-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 20px; padding: 6px 14px; border-radius: 20px; font-size: 12px; color: #9CA3AF; text-decoration: none; transition: background 0.2s, color 0.2s; }
+  .powered-link:hover { background: #F3F4F6; color: #6B7280; }
+  .powered-link strong { color: #0F766E; font-weight: 600; }
+  .powered-link:hover strong { color: #0D635B; }
+  .powered-wrap { text-align: center; }
+
+  .growth-card { margin-top: 20px; padding: 16px; background: #F0FDFA; border: 1px solid #CCFBF1; border-radius: 12px; text-align: center; opacity: 0; transform: translateY(8px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .growth-card.visible { opacity: 1; transform: translateY(0); }
+  .growth-card-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+  .growth-card-text { font-size: 13px; color: #6B7280; margin-bottom: 12px; line-height: 1.4; }
+  .growth-cta-btn { display: inline-block; padding: 10px 20px; background: #0F766E; color: #fff; border-radius: 10px; font-size: 14px; font-weight: 600; text-decoration: none; transition: opacity 0.2s; }
+  .growth-cta-btn:hover { opacity: 0.9; }
+
+  .nudge-text { margin-top: 16px; font-size: 13px; color: #9CA3AF; text-align: center; line-height: 1.5; }
+  .nudge-text a { color: #0F766E; text-decoration: underline; font-weight: 500; }
+  .nudge-text a:hover { color: #0D635B; }
 </style>
 </head>
 <body>
@@ -68,7 +84,11 @@
     <p class="privacy"><span class="privacy-icon">&#128274;</span>We only use your contact to confirm your booking.</p>
     <button type="submit" id="submitBtn">Continue to Booking</button>
   </form>
-  <p class="powered">Powered by VendeMás</p>
+  <div class="powered-wrap">
+    <a class="powered-link" id="poweredForm" href="#" target="_blank" rel="noopener">
+      &#9889; Powered by <strong>VendeMás</strong>
+    </a>
+  </div>
 </div>
 
 <div class="card hidden" id="successView">
@@ -76,25 +96,96 @@
   <h1 style="text-align:center" id="thankYouTitle">Thank you!</h1>
   <p class="success-text" style="margin-top:8px" id="thankYouMsg">We will contact you soon.</p>
   <p class="redirect-text hidden" id="redirectMsg">Redirecting to booking page... <a id="redirectLink" href="#">Click here</a> if not redirected.</p>
-  <p class="powered">Powered by VendeMás</p>
+  <div class="growth-card hidden" id="growthCard">
+    <p class="growth-card-title" id="growthTitle"></p>
+    <p class="growth-card-text" id="growthText"></p>
+    <a class="growth-cta-btn" id="growthBtn" href="#" target="_blank" rel="noopener"></a>
+  </div>
+  <div class="powered-wrap">
+    <a class="powered-link" id="poweredSuccess" href="#" target="_blank" rel="noopener">
+      &#9889; Powered by <strong>VendeMás</strong>
+    </a>
+  </div>
 </div>
 
 <div class="card hidden" id="closedView">
   <div class="success-icon">&#128274;</div>
   <h1 style="text-align:center" id="closedTitle">Form Unavailable</h1>
   <p class="success-text" style="margin-top:12px">This form is temporarily unavailable. Please contact the business directly.</p>
-  <p class="powered">Powered by VendeMás</p>
+  <div class="powered-wrap">
+    <a class="powered-link" id="poweredClosed" href="#" target="_blank" rel="noopener">
+      &#9889; Powered by <strong>VendeMás</strong>
+    </a>
+  </div>
 </div>
 
 <div class="card hidden" id="notFoundView">
   <div class="success-icon">&#128269;</div>
   <h1 style="text-align:center">Business Not Found</h1>
   <p class="success-text" style="margin-top:12px">This link doesn't seem to be valid. Please check the URL and try again.</p>
-  <p class="powered">Powered by VendeMás</p>
+  <p class="nudge-text" id="notFoundNudge"></p>
+  <div class="powered-wrap">
+    <a class="powered-link" id="poweredNotFound" href="#" target="_blank" rel="noopener">
+      &#9889; Powered by <strong>VendeMás</strong>
+    </a>
+  </div>
 </div>
 
 <script>
 (function() {
+  var CTA_URL = 'https://vendemas.app';
+
+  var COPY = {
+    es: {
+      growthTitle: '\u00bfTienes un negocio?',
+      growthText: 'Genera posts con IA que traen clientes a tu puerta.',
+      growthBtn: 'Prueba VendeMás Gratis \u2192',
+      nudge: '\u00bfQuieres hacer crecer tu negocio? <a href="' + CTA_URL + '" target="_blank" rel="noopener">Descubre VendeMás</a>'
+    },
+    en: {
+      growthTitle: 'Own a business?',
+      growthText: 'Get AI-powered posts that bring customers to you.',
+      growthBtn: 'Try VendeMás Free \u2192',
+      nudge: 'Looking to grow your business? <a href="' + CTA_URL + '" target="_blank" rel="noopener">Discover VendeMás</a>'
+    }
+  };
+
+  function detectLang() {
+    var nav = navigator.language || navigator.userLanguage || 'es';
+    return nav.toLowerCase().startsWith('es') ? 'es' : 'en';
+  }
+
+  var lang = detectLang();
+
+  function setLang(l) {
+    lang = (l && l.toLowerCase().startsWith('es')) ? 'es' : 'en';
+  }
+
+  function applyBranding() {
+    var links = document.querySelectorAll('.powered-link');
+    for (var i = 0; i < links.length; i++) {
+      links[i].href = CTA_URL;
+    }
+
+    var copy = COPY[lang] || COPY.es;
+
+    document.getElementById('growthTitle').textContent = copy.growthTitle;
+    document.getElementById('growthText').textContent = copy.growthText;
+    var growthBtn = document.getElementById('growthBtn');
+    growthBtn.textContent = copy.growthBtn;
+    growthBtn.href = CTA_URL;
+
+    document.getElementById('notFoundNudge').innerHTML = copy.nudge;
+  }
+
+  function showGrowthCard() {
+    var card = document.getElementById('growthCard');
+    card.classList.remove('hidden');
+    setTimeout(function() {
+      card.classList.add('visible');
+    }, 600);
+  }
+
   var params = new URLSearchParams(window.location.search);
   var path = window.location.pathname;
 
@@ -142,6 +233,7 @@
         'Leave your contact info and we\'ll get back to you!';
     }
 
+    applyBranding();
     showView('formView');
   }
 
@@ -192,6 +284,7 @@
         showView('successView');
         var biz = resolvedBusinessName;
         document.getElementById('thankYouMsg').textContent = biz + ' will contact you soon.';
+        showGrowthCard();
 
         if (resolvedBookingUrl) {
           var redirectEl = document.getElementById('redirectMsg');
@@ -200,7 +293,7 @@
           redirectEl.classList.remove('hidden');
           setTimeout(function() {
             window.location.href = resolvedBookingUrl;
-          }, 1500);
+          }, 2500);
         }
       } else if (result.data.closed) {
         showView('closedView');
@@ -221,6 +314,8 @@
 
   document.getElementById('leadForm').addEventListener('submit', submitForm);
 
+  applyBranding();
+
   if (slug) {
     showView('loadingView');
 
@@ -240,6 +335,9 @@
         resolvedBookingUrl = result.data.booking_url || null;
         resolvedLogoUrl = result.data.logo_url || null;
         resolvedAnonKey = result.data.anon_key || null;
+        if (result.data.language) {
+          setLang(result.data.language);
+        }
         if (sourcePostId && resolvedUserId) {
           var clickHeaders = { 'Content-Type': 'application/json' };
           if (resolvedAnonKey) clickHeaders['Authorization'] = 'Bearer ' + resolvedAnonKey;

@@ -17,6 +17,7 @@ import { getLeads, updateLeadStatus, updateLeadRevenue, type Lead, type LeadStat
 import { getPost, type Post } from '@/lib/posts';
 import { generateFollowUp } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
+import { markMilestone } from '@/lib/onboarding';
 
 const PLATFORM_ICONS: Record<string, string> = {
   facebook: 'logo-facebook',
@@ -121,6 +122,9 @@ export default function LeadDetailScreen() {
     try {
       const updated = await updateLeadStatus(lead.id, status);
       setLead(updated);
+      if (status === 'closed') {
+        markMilestone('first_booking_closed');
+      }
     } catch (error: any) {
       Alert.alert(t('common.error'), error.message);
     } finally {

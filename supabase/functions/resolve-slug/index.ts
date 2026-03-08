@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     const slugPattern = slug.replace(/\\/g, "\\\\").replace(/%/g, "\\%").replace(/_/g, "\\_");
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, business_name, booking_url, logo_url")
+      .select("id, business_name, booking_url, logo_url, default_language")
       .ilike("slug", slugPattern)
       .single();
 
@@ -54,6 +54,7 @@ Deno.serve(async (req) => {
       business_name: data.business_name,
       booking_url: data.booking_url,
       logo_url: data.logo_url,
+      language: data.default_language || null,
       anon_key: anonKey,
     });
   } catch (err) {

@@ -11,10 +11,15 @@ import Animated, {
   cancelAnimation,
   Easing,
 } from 'react-native-reanimated';
-import {
-  ExpoSpeechRecognitionModule,
-  useSpeechRecognitionEvent,
-} from 'expo-speech-recognition';
+let ExpoSpeechRecognitionModule: any = null;
+let useSpeechRecognitionEvent: any = (_event: string, _cb: any) => {};
+try {
+  const mod = require('expo-speech-recognition');
+  ExpoSpeechRecognitionModule = mod.ExpoSpeechRecognitionModule;
+  useSpeechRecognitionEvent = mod.useSpeechRecognitionEvent;
+} catch {
+  // Native module unavailable (Expo Go)
+}
 
 type VoiceInputButtonProps = {
   onTranscript: (text: string) => void;
@@ -80,6 +85,8 @@ export function VoiceInputButton({
   });
 
   const toggle = useCallback(async () => {
+    if (!ExpoSpeechRecognitionModule) return;
+
     if (listening) {
       ExpoSpeechRecognitionModule.stop();
       return;
@@ -102,6 +109,8 @@ export function VoiceInputButton({
       addsPunctuation: true,
     });
   }, [listening, lang, startPulse, t]);
+
+  if (!ExpoSpeechRecognitionModule) return null;
 
   return (
     <YStack alignItems="center" gap="$1">

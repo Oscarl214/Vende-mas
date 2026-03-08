@@ -28,6 +28,7 @@ import {
 } from '@/lib/leads';
 import { getPosts, type Post } from '@/lib/posts';
 import { getEffectiveBookingUrl } from '@/lib/booking';
+import { markMilestone } from '@/lib/onboarding';
 
 const PLATFORM_ICONS: Record<string, string> = {
   facebook: 'logo-facebook',
@@ -98,6 +99,9 @@ export default function LeadsScreen() {
       ]);
       setLeads(leadsData);
       setPosts(postsData);
+      if (leadsData.length > 0) {
+        markMilestone('first_lead');
+      }
     } catch {
       // silently fail
     } finally {
@@ -135,6 +139,7 @@ export default function LeadsScreen() {
           const newLead = payload.new as Lead;
           setLeads((prev) => [newLead, ...prev]);
           refreshUsage();
+          markMilestone('first_lead');
         },
       )
       .on(
