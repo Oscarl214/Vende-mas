@@ -19,6 +19,11 @@ type LeadContext = {
   came_from_smart_link?: boolean;
 };
 
+export type PostStrength = {
+  score: number;
+  reason: string;
+};
+
 export async function generateContent(params: {
   contentGoal: string;
   platform: string;
@@ -26,7 +31,7 @@ export async function generateContent(params: {
   maxLength?: string;
   profile: ProfileContext;
   bookingUrl?: string | null;
-}): Promise<{ caption: string }> {
+}): Promise<{ caption: string; postStrength?: PostStrength }> {
   const { data, error } = await supabase.functions.invoke('generate-content', {
     body: params,
   });

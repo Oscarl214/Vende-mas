@@ -111,7 +111,7 @@
 <div class="card hidden" id="closedView">
   <div class="success-icon">&#128274;</div>
   <h1 style="text-align:center" id="closedTitle">Form Unavailable</h1>
-  <p class="success-text" style="margin-top:12px">This form is temporarily unavailable. Please contact the business directly.</p>
+  <p class="success-text" style="margin-top:12px" id="closedBody">This form is temporarily unavailable. Please contact the business directly.</p>
   <div class="powered-wrap">
     <a class="powered-link" id="poweredClosed" href="#" target="_blank" rel="noopener">
       &#9889; Powered by <strong>VendeMás</strong>
@@ -121,8 +121,8 @@
 
 <div class="card hidden" id="notFoundView">
   <div class="success-icon">&#128269;</div>
-  <h1 style="text-align:center">Business Not Found</h1>
-  <p class="success-text" style="margin-top:12px">This link doesn't seem to be valid. Please check the URL and try again.</p>
+  <h1 style="text-align:center" id="notFoundTitle">Business Not Found</h1>
+  <p class="success-text" style="margin-top:12px" id="notFoundBody">This link doesn't seem to be valid. Please check the URL and try again.</p>
   <p class="nudge-text" id="notFoundNudge"></p>
   <div class="powered-wrap">
     <a class="powered-link" id="poweredNotFound" href="#" target="_blank" rel="noopener">
@@ -137,12 +137,64 @@
 
   var COPY = {
     es: {
+      titleSuffix: ' - Contacto',
+      subtitle: '\u00a1Deja tus datos y nos pondremos en contacto contigo!',
+      subtitleBooking: '\u00a1Deja tus datos para confirmar tu reserva!',
+      nameLabel: 'Nombre',
+      namePlaceholder: 'Tu nombre',
+      phoneLabel: 'Tel\u00e9fono',
+      phoneRecommended: '(recomendado)',
+      emailLabel: 'Correo',
+      emailOptional: '(opcional)',
+      eventDateLabel: 'Fecha del evento',
+      eventDateOptional: '(opcional)',
+      privacy: 'Solo usamos tu contacto para confirmar tu reserva.',
+      submitBooking: 'Continuar a Reserva',
+      submitSend: 'Enviar',
+      sending: 'Enviando...',
+      phoneError: 'Ingresa un n\u00famero de tel\u00e9fono v\u00e1lido',
+      thankYou: '\u00a1Gracias!',
+      successMsg: ' te contactar\u00e1 pronto.',
+      redirectMsg: 'Redirigiendo a la p\u00e1gina de reservas... ',
+      redirectLink: 'Haz clic aqu\u00ed',
+      redirectSuffix: ' si no se redirige.',
+      closedTitle: 'Formulario no disponible',
+      closedBody: 'Este formulario no est\u00e1 disponible temporalmente. Contacta al negocio directamente.',
+      notFoundTitle: 'Negocio no encontrado',
+      notFoundBody: 'Este enlace no parece ser v\u00e1lido. Revisa la URL e intenta de nuevo.',
+      genericError: 'Algo sali\u00f3 mal. Intenta de nuevo.',
       growthTitle: '\u00bfTienes un negocio?',
       growthText: 'Genera posts con IA que traen clientes a tu puerta.',
       growthBtn: 'Prueba VendeMás Gratis \u2192',
       nudge: '\u00bfQuieres hacer crecer tu negocio? <a href="' + CTA_URL + '" target="_blank" rel="noopener">Descubre VendeMás</a>'
     },
     en: {
+      titleSuffix: ' - Contact',
+      subtitle: 'Leave your contact info and we\'ll get back to you!',
+      subtitleBooking: 'Leave your contact info so we can confirm your booking!',
+      nameLabel: 'Name',
+      namePlaceholder: 'Your name',
+      phoneLabel: 'Phone',
+      phoneRecommended: '(recommended)',
+      emailLabel: 'Email',
+      emailOptional: '(optional)',
+      eventDateLabel: 'Event Date',
+      eventDateOptional: '(optional)',
+      privacy: 'We only use your contact to confirm your booking.',
+      submitBooking: 'Continue to Booking',
+      submitSend: 'Send',
+      sending: 'Sending...',
+      phoneError: 'Please enter a valid phone number',
+      thankYou: 'Thank you!',
+      successMsg: ' will contact you soon.',
+      redirectMsg: 'Redirecting to booking page... ',
+      redirectLink: 'Click here',
+      redirectSuffix: ' if not redirected.',
+      closedTitle: 'Form Unavailable',
+      closedBody: 'This form is temporarily unavailable. Please contact the business directly.',
+      notFoundTitle: 'Business Not Found',
+      notFoundBody: 'This link doesn\'t seem to be valid. Please check the URL and try again.',
+      genericError: 'Something went wrong. Please try again.',
       growthTitle: 'Own a business?',
       growthText: 'Get AI-powered posts that bring customers to you.',
       growthBtn: 'Try VendeMás Free \u2192',
@@ -161,6 +213,41 @@
     lang = (l && l.toLowerCase().startsWith('es')) ? 'es' : 'en';
   }
 
+  function applyLang() {
+    var c = COPY[lang] || COPY.es;
+
+    // Form labels
+    var nameLabel = document.querySelector('label[for="name"]');
+    nameLabel.textContent = c.nameLabel;
+    nameLabel.className = 'required';
+
+    document.querySelector('label[for="phone"]').innerHTML =
+      c.phoneLabel + ' <span class="optional">' + c.phoneRecommended + '</span>';
+    document.querySelector('label[for="email"]').innerHTML =
+      c.emailLabel + ' <span class="optional">' + c.emailOptional + '</span>';
+    document.querySelector('label[for="eventDate"]').innerHTML =
+      c.eventDateLabel + ' <span class="optional">' + c.eventDateOptional + '</span>';
+
+    // Placeholders
+    document.getElementById('name').placeholder = c.namePlaceholder;
+
+    // Privacy & validation
+    document.querySelector('.privacy').innerHTML =
+      '<span class="privacy-icon">&#128274;</span>' + c.privacy;
+    document.getElementById('phoneError').textContent = c.phoneError;
+
+    // Success view
+    document.getElementById('thankYouTitle').textContent = c.thankYou;
+
+    // Closed view
+    document.getElementById('closedTitle').textContent = c.closedTitle;
+    document.getElementById('closedBody').textContent = c.closedBody;
+
+    // Not found view
+    document.getElementById('notFoundTitle').textContent = c.notFoundTitle;
+    document.getElementById('notFoundBody').textContent = c.notFoundBody;
+  }
+
   function applyBranding() {
     var links = document.querySelectorAll('.powered-link');
     for (var i = 0; i < links.length; i++) {
@@ -176,6 +263,8 @@
     growthBtn.href = CTA_URL;
 
     document.getElementById('notFoundNudge').innerHTML = copy.nudge;
+
+    applyLang();
   }
 
   function showGrowthCard() {
@@ -212,9 +301,10 @@
   }
 
   function initForm() {
+    var c = COPY[lang] || COPY.es;
     var nameEl = document.getElementById('businessName');
     nameEl.textContent = resolvedBusinessName;
-    document.title = resolvedBusinessName + ' - Contact';
+    document.title = resolvedBusinessName + c.titleSuffix;
 
     if (resolvedLogoUrl) {
       var logoEl = document.getElementById('businessLogo');
@@ -224,13 +314,11 @@
 
     var submitBtn = document.getElementById('submitBtn');
     if (resolvedBookingUrl) {
-      submitBtn.textContent = 'Continue to Booking';
-      document.getElementById('formSubtitle').textContent =
-        'Leave your contact info so we can confirm your booking!';
+      submitBtn.textContent = c.submitBooking;
+      document.getElementById('formSubtitle').textContent = c.subtitleBooking;
     } else {
-      submitBtn.textContent = 'Send';
-      document.getElementById('formSubtitle').textContent =
-        'Leave your contact info and we\'ll get back to you!';
+      submitBtn.textContent = c.submitSend;
+      document.getElementById('formSubtitle').textContent = c.subtitle;
     }
 
     applyBranding();
@@ -257,8 +345,9 @@
       return;
     }
 
+    var c = COPY[lang] || COPY.es;
     btn.disabled = true;
-    btn.textContent = 'Sending...';
+    btn.textContent = c.sending;
 
     var data = {
       user_id: resolvedUserId,
@@ -273,6 +362,11 @@
     var leadHeaders = { 'Content-Type': 'application/json' };
     if (resolvedAnonKey) leadHeaders['Authorization'] = 'Bearer ' + resolvedAnonKey;
 
+    var resetBtn = function() {
+      btn.disabled = false;
+      btn.textContent = resolvedBookingUrl ? c.submitBooking : c.submitSend;
+    };
+
     fetch(fnUrl, {
       method: 'POST',
       headers: leadHeaders,
@@ -282,14 +376,17 @@
     .then(function(result) {
       if (result.ok && result.data.success) {
         showView('successView');
-        var biz = resolvedBusinessName;
-        document.getElementById('thankYouMsg').textContent = biz + ' will contact you soon.';
+        document.getElementById('thankYouMsg').textContent =
+          resolvedBusinessName + c.successMsg;
         showGrowthCard();
 
         if (resolvedBookingUrl) {
           var redirectEl = document.getElementById('redirectMsg');
           var linkEl = document.getElementById('redirectLink');
+          linkEl.textContent = c.redirectLink;
           linkEl.href = resolvedBookingUrl;
+          redirectEl.childNodes[0].textContent = c.redirectMsg;
+          if (redirectEl.childNodes[2]) redirectEl.childNodes[2].textContent = c.redirectSuffix;
           redirectEl.classList.remove('hidden');
           setTimeout(function() {
             window.location.href = resolvedBookingUrl;
@@ -298,17 +395,15 @@
       } else if (result.data.closed) {
         showView('closedView');
       } else {
-        errorEl.textContent = result.data.error || 'Something went wrong. Please try again.';
+        errorEl.textContent = result.data.error || c.genericError;
         errorEl.classList.remove('hidden');
-        btn.disabled = false;
-        btn.textContent = resolvedBookingUrl ? 'Continue to Booking' : 'Send';
+        resetBtn();
       }
     })
     .catch(function() {
-      errorEl.textContent = 'Something went wrong. Please try again.';
+      errorEl.textContent = c.genericError;
       errorEl.classList.remove('hidden');
-      btn.disabled = false;
-      btn.textContent = resolvedBookingUrl ? 'Continue to Booking' : 'Send';
+      resetBtn();
     });
   }
 

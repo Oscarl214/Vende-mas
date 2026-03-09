@@ -425,7 +425,15 @@
     "limitMessage": "Llegaste al límite de posts gratis este mes.",
     "voiceListening": "Escuchando...",
     "voiceTapToSpeak": "Toca para hablar",
-    "micPermissionDenied": "Se requiere permiso del micrófono para entrada de voz."
+    "micPermissionDenied": "Se requiere permiso del micrófono para entrada de voz.",
+    "optimizedFor": "Optimizado para {{platform}}",
+    "postStrength": "Fuerza del Post",
+    "postStrengthOf": "/ 10",
+    "editCaption": "Editar Caption",
+    "saveEdit": "Guardar",
+    "sharePost": "Compartir Post",
+    "copyCaption": "Copiar Caption",
+    "shareTip": "La mayoría de las redes sociales no aceptan captions pegados. Copia el caption primero, luego abre la app y pégalo tú mismo."
   },
   "tiers": {
     "free": "Gratis",

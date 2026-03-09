@@ -8,6 +8,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { PostPreviewCard } from '@/components/ui/post-preview-card';
 import { useSession } from '@/hooks/use-session';
 import { getPost, archivePost, unarchivePost, type Post } from '@/lib/posts';
 import { getLeadsByPost, type Lead, type LeadStatus } from '@/lib/leads';
@@ -161,20 +162,33 @@ export default function PostDetailScreen() {
         </XStack>
 
         {/* Full post content */}
-        <YStack gap="$2">
-          <Text fontSize={15} fontWeight="600" color="$brandSecondary">
-            {t('postDetail.fullPost')}
-          </Text>
-          <Card variant="elevated" padding="$4">
-            <Text
-              fontSize={14}
-              color="$brandText"
-              lineHeight={22}
-              selectable
-            >
-              {post.generated_content}
+        <YStack gap="$2.5">
+          <XStack alignItems="center" justifyContent="space-between">
+            <Text fontSize={15} fontWeight="600" color="$brandSecondary">
+              {t('postDetail.fullPost')}
             </Text>
-          </Card>
+            <XStack
+              backgroundColor="$brandBackground"
+              borderRadius={20}
+              paddingHorizontal="$2.5"
+              paddingVertical="$1"
+              alignItems="center"
+              gap="$1.5"
+            >
+              <Ionicons name={iconName as any} size={12} color="#0F766E" />
+              <Text fontSize={11} fontWeight="600" color="$brandPrimary">
+                {t('contentEngine.optimizedFor', {
+                  platform: platform.replace('_', ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+                })}
+              </Text>
+            </XStack>
+          </XStack>
+          <PostPreviewCard
+            platform={platform}
+            businessName={profile?.business_name ?? ''}
+            caption={post.generated_content}
+            bookingUrl={trackingLink || undefined}
+          />
         </YStack>
 
         {/* Copy buttons */}

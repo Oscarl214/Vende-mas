@@ -7,6 +7,7 @@ import {
   Pressable,
   ScrollView,
   Share,
+  TextInput,
 } from 'react-native';
 import { YStack, Text, XStack, Sheet } from 'tamagui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -18,9 +19,11 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { InputField } from '@/components/ui/input';
+import { PostPreviewCard } from '@/components/ui/post-preview-card';
+import { PostStrengthBadge } from '@/components/ui/post-strength-badge';
 import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
-import { generateContent } from '@/lib/ai';
+import { generateContent, type PostStrength } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
 import { createPost } from '@/lib/posts';
 import { markOnboardingSeen, markMilestone } from '@/lib/onboarding';
@@ -84,10 +87,12 @@ export default function GeneratePostScreen() {
   ] as const;
 
   const [generatedCaption, setGeneratedCaption] = useState('');
+  const [postStrength, setPostStrength] = useState<PostStrength | null>(null);
   const [savedPostId, setSavedPostId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   const showResult = generatedCaption.length > 0;
   const formUrl = user
@@ -116,6 +121,8 @@ export default function GeneratePostScreen() {
     setCopied(false);
     setCopiedLink(false);
     setSavedPostId(null);
+    setPostStrength(null);
+    setEditing(false);
 
     try {
       const result = await generateContent({
@@ -135,6 +142,7 @@ export default function GeneratePostScreen() {
         bookingUrl: user ? getEffectiveBookingUrl(profile ?? null, user.id) : null,
       });
       setGeneratedCaption(result.caption);
+      if (result.postStrength) setPostStrength(result.postStrength);
 
       if (user && profile) {
         const post = await createPost(user.id, {
@@ -421,65 +429,92 @@ export default function GeneratePostScreen() {
           ) : (
             <Animated.View key="result" entering={FadeIn.duration(300)}>
               <YStack gap="$4">
+                {/* Title */}
                 <YStack gap="$1">
                   <Text fontSize={22} fontWeight="bold" color="$brandSecondary">
                     {isOnboarding
                       ? `✨ ${t('onboarding.postReady')}`
                       : t('contentEngine.resultTitle')}
                   </Text>
-                  <XStack gap="$2" alignItems="center">
-                    <Ionicons
-                      name={PLATFORM_ICONS[platform] as any}
-                      size={16}
-                      color="#6B7280"
-                    />
-                    <Text fontSize={13} color="$brandTextLight">
-                      {t(`contentEngine.platforms.${platform}`)} &middot;{' '}
-                      {t(`contentEngine.goals.${goal}`)}
-                    </Text>
-                  </XStack>
                 </YStack>
 
-                {/* Generated caption */}
-                <Card variant="elevated" padding="$4" gap="$3">
-                  <Text
-                    fontSize={15}
-                    lineHeight={24}
-                    color="$brandText"
-                    selectable
+                {/* "Optimized for" pill */}
+                <XStack alignItems="center" gap="$2">
+                  <XStack
+                    backgroundColor="$brandBackground"
+                    borderRadius={20}
+                    paddingHorizontal="$3"
+                    paddingVertical="$1.5"
+                    alignItems="center"
+                    gap="$1.5"
                   >
-                    {generatedCaption}
-                  </Text>
-                  {formUrl.length > 0 && savedPostId != null && (
-                    <Text fontSize={13} color="$brandPrimary" selectable>
-                      {formUrl}
+                    <Ionicons
+                      name={PLATFORM_ICONS[platform] as any}
+                      size={14}
+                      color="#0F766E"
+                    />
+                    <Text fontSize={12} fontWeight="600" color="$brandPrimary">
+                      {t('contentEngine.optimizedFor', {
+                        platform: t(`contentEngine.platforms.${platform}`),
+                      })}
                     </Text>
-                  )}
-                  {!isOnboarding && (
-                    <XStack justifyContent="flex-end">
-                      <Pressable onPress={handleCopyCaption}>
-                        <XStack alignItems="center" gap="$1.5" paddingVertical="$1">
-                          <Ionicons
-                            name={copied ? 'checkmark-circle' : 'copy-outline'}
-                            size={18}
-                            color={copied ? '#16A34A' : '#0F766E'}
-                          />
-                          <Text
-                            fontSize={13}
-                            fontWeight="500"
-                            color={copied ? '$brandSuccess' : '$brandPrimary'}
-                          >
-                            {copied
-                              ? t('contentEngine.copied')
-                              : t('contentEngine.copy')}
-                          </Text>
-                        </XStack>
-                      </Pressable>
-                    </XStack>
-                  )}
-                </Card>
+                  </XStack>
+                </XStack>
 
-                {isOnboarding ? (
+                {/* Platform preview card */}
+                {editing ? (
+                  <Card variant="outlined" padding="$3" gap="$2.5">
+                    <Text fontSize={13} fontWeight="600" color="$brandText">
+                      {t('contentEngine.editCaption')}
+                    </Text>
+                    <TextInput
+                      style={{
+                        fontSize: 15,
+                        lineHeight: 23,
+                        color: '#1C1E21',
+                        borderWidth: 1,
+                        borderColor: '#D1D5DB',
+                        borderRadius: 10,
+                        padding: 12,
+                        minHeight: 120,
+                        textAlignVertical: 'top',
+                      }}
+                      multiline
+                      value={generatedCaption}
+                      onChangeText={setGeneratedCaption}
+                      autoFocus
+                    />
+                    <Button
+                      variant="primary"
+                      height={40}
+                      onPress={() => setEditing(false)}
+                    >
+                      {t('contentEngine.saveEdit')}
+                    </Button>
+                  </Card>
+                ) : (
+                  <PostPreviewCard
+                    platform={platform}
+                    businessName={profile?.business_name ?? ''}
+                    caption={generatedCaption}
+                    bookingUrl={
+                      formUrl.length > 0 && savedPostId != null
+                        ? formUrl
+                        : undefined
+                    }
+                  />
+                )}
+
+                {/* Post strength score */}
+                {postStrength && (
+                  <PostStrengthBadge
+                    score={postStrength.score}
+                    reason={postStrength.reason}
+                  />
+                )}
+
+                {/* Action buttons -- shared between onboarding and regular */}
+                <YStack gap="$2.5">
                   <XStack gap="$3">
                     <Button
                       variant="outline"
@@ -495,7 +530,7 @@ export default function GeneratePostScreen() {
                     >
                       {copied
                         ? t('contentEngine.copied')
-                        : t('onboarding.copyPost')}
+                        : t('contentEngine.copyCaption')}
                     </Button>
                     <Button
                       variant="primary"
@@ -505,10 +540,41 @@ export default function GeneratePostScreen() {
                         <Ionicons name="share-outline" size={18} color="#fff" />
                       }
                     >
-                      {t('onboarding.sharePost')}
+                      {t('contentEngine.sharePost')}
                     </Button>
                   </XStack>
-                ) : (
+
+                  <XStack
+                    backgroundColor="$brandBackground"
+                    borderRadius={10}
+                    padding="$2.5"
+                    alignItems="flex-start"
+                    gap="$2"
+                  >
+                    <Ionicons name="information-circle-outline" size={16} color="#6B7280" style={{ marginTop: 1 }} />
+                    <Text fontSize={12} color="$brandTextLight" lineHeight={17} flex={1}>
+                      {t('contentEngine.shareTip')}
+                    </Text>
+                  </XStack>
+
+                  {!editing && (
+                    <Pressable onPress={() => setEditing(true)}>
+                      <XStack
+                        alignItems="center"
+                        justifyContent="center"
+                        gap="$1.5"
+                        paddingVertical="$2"
+                      >
+                        <Ionicons name="create-outline" size={16} color="#6B7280" />
+                        <Text fontSize={13} fontWeight="500" color="$brandTextLight">
+                          {t('contentEngine.editCaption')}
+                        </Text>
+                      </XStack>
+                    </Pressable>
+                  )}
+                </YStack>
+
+                {!isOnboarding && (
                   <>
                     {/* Lead form link */}
                     {formUrl.length > 0 && savedPostId != null && (

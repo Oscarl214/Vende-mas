@@ -425,7 +425,15 @@
     "limitMessage": "You've reached the free post limit this month.",
     "voiceListening": "Listening...",
     "voiceTapToSpeak": "Tap to speak",
-    "micPermissionDenied": "Microphone permission is required for voice input."
+    "micPermissionDenied": "Microphone permission is required for voice input.",
+    "optimizedFor": "Optimized for {{platform}}",
+    "postStrength": "Post Strength",
+    "postStrengthOf": "/ 10",
+    "editCaption": "Edit Caption",
+    "saveEdit": "Save",
+    "sharePost": "Share Post",
+    "copyCaption": "Copy Caption",
+    "shareTip": "Most social media platforms won't accept pasted captions. Copy the caption first, then open the app and paste it yourself."
   },
   "tiers": {
     "free": "Free",
