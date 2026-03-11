@@ -124,87 +124,106 @@ export default function PostsScreen() {
 
     return (
       <Pressable onPress={() => router.push(`/(app)/post-detail?id=${post.id}`)}>
-        <Card variant="outlined" padding="$4" gap="$3">
-          <Text fontSize={13} color="$brandTextLight">
-            {truncateCaption(post.generated_content)}
-          </Text>
-          <XStack flexWrap="wrap" gap="$2" alignItems="center">
-            <XStack alignItems="center" gap="$1">
-              <Ionicons name={iconName as any} size={16} color="#6B7280" />
-              <Text fontSize={12} color="$brandTextLight" textTransform="capitalize">
+        <Card variant="elevated" padding="$4" gap="$3">
+          {/* Platform + date row */}
+          <XStack justifyContent="space-between" alignItems="center">
+            <XStack alignItems="center" gap="$1.5">
+              <XStack
+                width={26}
+                height={26}
+                borderRadius={8}
+                backgroundColor="$brandBackground"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Ionicons name={iconName as any} size={14} color="#6B7280" />
+              </XStack>
+              <Text fontSize={12} fontWeight="600" color="$brandTextLight" textTransform="capitalize">
                 {platform.replace('_', ' ')}
               </Text>
             </XStack>
-            <Text fontSize={12} color="$brandTextLight">
+            <Text fontSize={11} color="$brandTextLight">
               {formatPostDate(post.created_at, lang)}
             </Text>
           </XStack>
-          {link
-            ? (
-              <XStack alignItems="center" gap="$2" flexWrap="wrap">
-                <Text
-                  fontSize={11}
-                  color="$brandPrimary"
-                  numberOfLines={1}
-                  flex={1}
-                  minWidth={0}
-                >
-                  {link.length > 42 ? link.slice(0, 42) + '…' : link}
+
+          {/* Caption preview */}
+          <Text fontSize={14} color="$brandText" lineHeight={20}>
+            {truncateCaption(post.generated_content)}
+          </Text>
+
+          {/* Tracking link */}
+          {link ? (
+            <XStack
+              backgroundColor="$brandBackground"
+              borderRadius={8}
+              paddingHorizontal="$2.5"
+              paddingVertical="$1.5"
+              alignItems="center"
+              gap="$2"
+            >
+              <Text
+                fontSize={11}
+                color="$brandPrimary"
+                numberOfLines={1}
+                flex={1}
+                minWidth={0}
+              >
+                {link.length > 42 ? link.slice(0, 42) + '…' : link}
+              </Text>
+              <Pressable onPress={(e) => { e.stopPropagation(); handleCopyLink(post.id); }}>
+                <XStack alignItems="center" gap="$1">
+                  <Ionicons
+                    name={isCopied ? 'checkmark-circle' : 'copy-outline'}
+                    size={15}
+                    color={isCopied ? '#16A34A' : '#0F766E'}
+                  />
+                  <Text fontSize={12} fontWeight="600" color={isCopied ? '$brandSuccess' : '$brandPrimary'}>
+                    {isCopied ? t('posts.copied') : t('posts.copyLink')}
+                  </Text>
+                </XStack>
+              </Pressable>
+            </XStack>
+          ) : null}
+
+          {/* Stats + archive row */}
+          <XStack justifyContent="space-between" alignItems="center">
+            <XStack gap="$3">
+              <XStack alignItems="center" gap="$1">
+                <Ionicons name="hand-left-outline" size={13} color="#9CA3AF" />
+                <Text fontSize={12} fontWeight="500" color="$brandTextLight">
+                  {t('posts.clicks', { count: clicks })}
                 </Text>
-                <Pressable onPress={(e) => { e.stopPropagation(); handleCopyLink(post.id); }}>
-                  <XStack alignItems="center" gap="$1">
-                    <Ionicons
-                      name={isCopied ? 'checkmark-circle' : 'copy-outline'}
-                      size={16}
-                      color={isCopied ? '#16A34A' : '#0F766E'}
-                    />
-                    <Text
-                      fontSize={12}
-                      fontWeight="500"
-                      color={isCopied ? '$brandSuccess' : '$brandPrimary'}
-                    >
-                      {isCopied ? t('posts.copied') : t('posts.copyLink')}
-                    </Text>
-                  </XStack>
-                </Pressable>
               </XStack>
-              )
-            : null}
-          <XStack gap="$4">
-            <XStack alignItems="center" gap="$1">
-              <Ionicons name="hand-left-outline" size={14} color="#6B7280" />
-              <Text fontSize={13} color="$brandText">
-                {t('posts.clicks', { count: clicks })}
-              </Text>
+              <XStack alignItems="center" gap="$1">
+                <Ionicons name="people-outline" size={13} color="#9CA3AF" />
+                <Text fontSize={12} fontWeight="500" color="$brandTextLight">
+                  {t('posts.leads', { count: leadsCount })}
+                </Text>
+              </XStack>
             </XStack>
-            <XStack alignItems="center" gap="$1">
-              <Ionicons name="people-outline" size={14} color="#6B7280" />
-              <Text fontSize={13} color="$brandText">
-                {t('posts.leads', { count: leadsCount })}
-              </Text>
-            </XStack>
+            <Pressable
+              onPress={(e) => {
+                e?.stopPropagation?.();
+                if (postFilter === 'archive') {
+                  handleUnarchive(post);
+                } else {
+                  handleArchive(post);
+                }
+              }}
+            >
+              <XStack alignItems="center" gap="$1">
+                <Ionicons
+                  name={postFilter === 'archive' ? 'arrow-undo-outline' : 'archive-outline'}
+                  size={14}
+                  color="#9CA3AF"
+                />
+                <Text fontSize={12} fontWeight="500" color="$brandTextLight">
+                  {postFilter === 'archive' ? t('posts.unarchive') : t('posts.archive')}
+                </Text>
+              </XStack>
+            </Pressable>
           </XStack>
-          <Pressable
-            onPress={(e) => {
-              e?.stopPropagation?.();
-              if (postFilter === 'archive') {
-                handleUnarchive(post);
-              } else {
-                handleArchive(post);
-              }
-            }}
-          >
-            <XStack alignItems="center" gap="$1.5">
-              <Ionicons
-                name={postFilter === 'archive' ? 'arrow-undo-outline' : 'archive-outline'}
-                size={16}
-                color="#6B7280"
-              />
-              <Text fontSize={12} fontWeight="500" color="$brandTextLight">
-                {postFilter === 'archive' ? t('posts.unarchive') : t('posts.archive')}
-              </Text>
-            </XStack>
-          </Pressable>
         </Card>
       </Pressable>
     );
@@ -220,45 +239,32 @@ export default function PostsScreen() {
       : t('posts.emptyTitle');
 
   return (
-    <YStack flex={1}>
+    <YStack flex={1} backgroundColor="$background">
       {/* Active | Archive segment */}
       <XStack paddingHorizontal="$4" paddingTop="$3" paddingBottom="$2" gap="$2">
-        <Pressable onPress={() => setPostFilter('active')}>
-          <XStack
-            paddingHorizontal="$3"
-            paddingVertical="$2"
-            borderRadius={20}
-            backgroundColor={postFilter === 'active' ? '$brandPrimary' : '$brandBackground'}
-            borderWidth={postFilter === 'active' ? 0 : 1}
-            borderColor="$brandBorder"
-          >
-            <Text
-              fontSize={13}
-              fontWeight={postFilter === 'active' ? '600' : '400'}
-              color={postFilter === 'active' ? '$brandTextInverse' : '$brandTextLight'}
-            >
-              {t('posts.active')}
-            </Text>
-          </XStack>
-        </Pressable>
-        <Pressable onPress={() => setPostFilter('archive')}>
-          <XStack
-            paddingHorizontal="$3"
-            paddingVertical="$2"
-            borderRadius={20}
-            backgroundColor={postFilter === 'archive' ? '$brandPrimary' : '$brandBackground'}
-            borderWidth={postFilter === 'archive' ? 0 : 1}
-            borderColor="$brandBorder"
-          >
-            <Text
-              fontSize={13}
-              fontWeight={postFilter === 'archive' ? '600' : '400'}
-              color={postFilter === 'archive' ? '$brandTextInverse' : '$brandTextLight'}
-            >
-              {t('posts.archive')}
-            </Text>
-          </XStack>
-        </Pressable>
+        {(['active', 'archive'] as const).map((f) => {
+          const active = postFilter === f;
+          return (
+            <Pressable key={f} onPress={() => setPostFilter(f)}>
+              <XStack
+                paddingHorizontal="$3"
+                paddingVertical="$2"
+                borderRadius={20}
+                backgroundColor={active ? '$brandPrimary' : '$brandBackground'}
+                borderWidth={active ? 0 : 1}
+                borderColor="$brandBorder"
+              >
+                <Text
+                  fontSize={13}
+                  fontWeight={active ? '600' : '400'}
+                  color={active ? '$brandTextInverse' : '$brandTextLight'}
+                >
+                  {f === 'active' ? t('posts.active') : t('posts.archive')}
+                </Text>
+              </XStack>
+            </Pressable>
+          );
+        })}
       </XStack>
 
       {loading ? (

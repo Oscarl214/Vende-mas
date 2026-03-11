@@ -3,6 +3,7 @@ import {
   Alert,
   FlatList,
   Pressable,
+  ScrollView,
   Share,
   Platform as RNPlatform,
 } from 'react-native';
@@ -396,21 +397,21 @@ export default function LeadsScreen() {
 
       {/* Header: count + share + add */}
       <XStack justifyContent="space-between" alignItems="center">
-        <Text fontSize={14} color="$brandTextLight">
+        <Text fontSize={13} fontWeight="600" color="$brandTextLight" letterSpacing={0.2}>
           {t('leads.leadCount', { count: leads.length })}
         </Text>
-        <XStack gap="$2">
+        <XStack gap="$2" alignItems="center">
           <Pressable onPress={handleShareForm}>
             <XStack
               alignItems="center"
               gap="$1.5"
-              paddingHorizontal="$2.5"
-              paddingVertical="$1.5"
-              borderRadius={8}
+              paddingHorizontal="$3"
+              paddingVertical="$2"
+              borderRadius={10}
               backgroundColor="$brandPrimary"
             >
-              <Ionicons name="share-outline" size={16} color="#fff" />
-              <Text fontSize={13} fontWeight="500" color="$brandTextInverse">
+              <Ionicons name="share-outline" size={15} color="#fff" />
+              <Text fontSize={13} fontWeight="600" color="$brandTextInverse">
                 {t('leads.shareFormLink')}
               </Text>
             </XStack>
@@ -425,14 +426,14 @@ export default function LeadsScreen() {
             }}
           >
             <XStack
-              width={34}
-              height={34}
-              borderRadius={17}
+              width={36}
+              height={36}
+              borderRadius={12}
               backgroundColor="$brandAccent"
               justifyContent="center"
               alignItems="center"
             >
-              <Ionicons name="add" size={20} color="#fff" />
+              <Ionicons name="add" size={22} color="#fff" />
             </XStack>
           </Pressable>
         </XStack>
@@ -480,7 +481,7 @@ export default function LeadsScreen() {
       )}
 
       {/* Filters */}
-      <XStack gap="$2">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
         {filters.map(({ key, label }) => {
           const active = filter === key;
           return (
@@ -504,7 +505,7 @@ export default function LeadsScreen() {
             </Pressable>
           );
         })}
-      </XStack>
+      </ScrollView>
 
       {/* Lead list */}
       {leads.length === 0 && !loading ? (

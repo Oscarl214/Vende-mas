@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { YStack, Text, XStack, Separator } from 'tamagui';
+import { YStack, Text, XStack } from 'tamagui';
 import { useRouter } from 'expo-router';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -77,110 +77,143 @@ export default function SignUpScreen() {
       >
         <YStack
           flex={1}
-          padding="$6"
-          paddingTop={insets.top + 20}
+          paddingHorizontal="$6"
+          paddingTop={insets.top + 24}
+          paddingBottom="$6"
           backgroundColor="$brandBackground"
-          gap="$4"
+          gap="$5"
         >
-          <YStack gap="$2" marginBottom="$4">
-            <Text fontSize={28} fontWeight="bold" color="$brandSecondary">
+          {/* Brand mark */}
+          <YStack alignItems="flex-start" gap="$1" marginBottom="$2">
+            <XStack
+              width={44}
+              height={44}
+              borderRadius={13}
+              backgroundColor="$brandPrimary"
+              justifyContent="center"
+              alignItems="center"
+              marginBottom="$3"
+              style={{
+                shadowColor: '#0F766E',
+                shadowOpacity: 0.25,
+                shadowRadius: 12,
+                shadowOffset: { width: 0, height: 5 },
+              }}
+            >
+              <Text fontSize={20} fontWeight="800" color="$brandTextInverse" letterSpacing={-1}>
+                V
+              </Text>
+            </XStack>
+            <Text fontSize={28} fontWeight="800" color="$brandSecondary" letterSpacing={-0.5}>
               {t('auth.signUp.title')}
             </Text>
-            <Text fontSize={16} color="$brandTextLight">
+            <Text fontSize={15} color="$brandTextLight" lineHeight={22}>
               {t('auth.signUp.subtitle')}
             </Text>
           </YStack>
 
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <InputField
-                label={t('auth.signUp.emailLabel')}
-                placeholder={t('auth.signUp.emailPlaceholder')}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                onChangeText={onChange}
-                onBlur={onBlur}
-                value={value}
-                error={errors.email?.message}
-              />
-            )}
-          />
+          {/* Form */}
+          <YStack gap="$4">
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <InputField
+                  label={t('auth.signUp.emailLabel')}
+                  placeholder={t('auth.signUp.emailPlaceholder')}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  error={errors.email?.message}
+                />
+              )}
+            />
 
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <InputField
-                label={t('auth.signUp.passwordLabel')}
-                placeholder={t('auth.signUp.passwordPlaceholder')}
-                secureTextEntry
-                onChangeText={onChange}
-                onBlur={onBlur}
-                value={value}
-                error={errors.password?.message}
-              />
-            )}
-          />
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <InputField
+                  label={t('auth.signUp.passwordLabel')}
+                  placeholder={t('auth.signUp.passwordPlaceholder')}
+                  secureTextEntry
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  error={errors.password?.message}
+                />
+              )}
+            />
 
-          <Controller
-            control={control}
-            name="confirmPassword"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <InputField
-                label={t('auth.signUp.confirmPasswordLabel')}
-                placeholder={t('auth.signUp.confirmPasswordPlaceholder')}
-                secureTextEntry
-                onChangeText={onChange}
-                onBlur={onBlur}
-                value={value}
-                error={errors.confirmPassword?.message}
-              />
-            )}
-          />
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <InputField
+                  label={t('auth.signUp.confirmPasswordLabel')}
+                  placeholder={t('auth.signUp.confirmPasswordPlaceholder')}
+                  secureTextEntry
+                  onChangeText={onChange}
+                  onBlur={onBlur}
+                  value={value}
+                  error={errors.confirmPassword?.message}
+                />
+              )}
+            />
+          </YStack>
 
           <Button
             variant="primary"
+            height={54}
             onPress={handleSubmit(onSubmit)}
             disabled={loading}
             opacity={loading ? 0.7 : 1}
-            marginTop="$2"
           >
             {loading ? t('auth.signUp.submitting') : t('auth.signUp.submit')}
           </Button>
 
-          <XStack alignItems="center" gap="$3" marginVertical="$2">
-            <Separator flex={1} />
-            <Text fontSize={14} color="$brandTextLight">{t('common.or')}</Text>
-            <Separator flex={1} />
+          {/* Divider */}
+          <XStack alignItems="center" gap="$3">
+            <YStack flex={1} height={1} backgroundColor="$brandBorder" />
+            <Text fontSize={12} fontWeight="600" color="$brandTextLight" letterSpacing={0.5} textTransform="uppercase">
+              {t('common.or')}
+            </Text>
+            <YStack flex={1} height={1} backgroundColor="$brandBorder" />
           </XStack>
 
-          <Button
-            variant="outline"
-            onPress={handleGoogleSignUp}
-            disabled={loading}
-            icon={<Ionicons name="logo-google" size={20} color="#4285F4" />}
-          >
-            {t('auth.signUp.continueGoogle')}
-          </Button>
+          {/* Social buttons */}
+          <YStack gap="$2.5">
+            <Button
+              variant="outline"
+              height={50}
+              onPress={handleGoogleSignUp}
+              disabled={loading}
+              icon={<Ionicons name="logo-google" size={18} color="#4285F4" />}
+            >
+              {t('auth.signUp.continueGoogle')}
+            </Button>
 
-          <Button
-            variant="outline"
-            onPress={() => router.push('/(auth)/verify-otp')}
-            disabled={loading}
-            icon={<Ionicons name="call-outline" size={20} color="#333" />}
-          >
-            {t('auth.signUp.continuePhone')}
-          </Button>
+            <Button
+              variant="outline"
+              height={50}
+              onPress={() => router.push('/(auth)/verify-otp')}
+              disabled={loading}
+              icon={<Ionicons name="call-outline" size={18} color="#374151" />}
+            >
+              {t('auth.signUp.continuePhone')}
+            </Button>
+          </YStack>
 
-          <XStack justifyContent="center" marginTop="$4">
+          {/* Footer */}
+          <XStack justifyContent="center" gap="$1" marginTop="$2">
             <Text fontSize={14} color="$brandTextLight">
               {t('auth.signUp.hasAccount')}
             </Text>
             <Text
               fontSize={14}
-              fontWeight="600"
+              fontWeight="700"
               color="$brandPrimary"
               onPress={() => router.push('/(auth)/sign-in')}
             >

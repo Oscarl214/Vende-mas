@@ -79,33 +79,35 @@ export default function DashboardScreen() {
     >
       <YStack padding="$5" gap="$4">
         <XStack justifyContent="space-between" alignItems="flex-start">
-          <YStack gap="$1" flex={1}>
-            <Text fontSize={14} color="$brandTextLight">
+          <YStack gap="$0.5" flex={1}>
+            <Text fontSize={13} color="$brandTextLight" letterSpacing={0.2}>
               {t('dashboard.welcomeBack')}
             </Text>
-            <Text fontSize={24} fontWeight="bold" color="$brandSecondary">
+            <Text fontSize={26} fontWeight="800" color="$brandSecondary" letterSpacing={-0.5}>
               {profile?.business_name ?? t('dashboard.yourBusiness')}
             </Text>
           </YStack>
           <XStack
-            paddingHorizontal="$2.5"
-            paddingVertical="$1.5"
-            borderRadius={8}
-            backgroundColor={tier === 'pro' ? '$brandAccent' : '$brandBorder'}
+            paddingHorizontal={10}
+            paddingVertical={5}
+            borderRadius={20}
+            backgroundColor={tier === 'pro' ? '#F97316' : '#F3F4F6'}
+            marginTop="$1"
           >
             <Text
-              fontSize={12}
-              fontWeight="bold"
-              color={tier === 'pro' ? '$brandTextInverse' : '$brandTextLight'}
+              fontSize={11}
+              fontWeight="700"
+              letterSpacing={0.5}
+              color={tier === 'pro' ? '#FFFFFF' : '#6B7280'}
             >
-              {tier === 'pro' ? t('dashboard.pro') : t('dashboard.free')}
+              {tier === 'pro' ? t('dashboard.pro').toUpperCase() : t('dashboard.free').toUpperCase()}
             </Text>
           </XStack>
         </XStack>
 
         {showChecklist && (
           <Card variant="outlined" gap="$3">
-            <Text fontSize={15} fontWeight="600" color="$brandSecondary">
+            <Text fontSize={11} fontWeight="700" color="$brandTextLight" letterSpacing={1.0} textTransform="uppercase">
               {t('onboarding.growthSetup')}
             </Text>
             {MILESTONES.map(({ key, labelKey }) => {
@@ -132,34 +134,40 @@ export default function DashboardScreen() {
 
         {tier === 'free' && (
           <Pressable onPress={() => router.push('/(app)/paywall')}>
-            <Card variant="flat" padding="$3.5">
-              <XStack alignItems="center" gap="$3">
-                <XStack
-                  width={40}
-                  height={40}
-                  borderRadius={20}
-                  backgroundColor="$brandAccent"
-                  justifyContent="center"
-                  alignItems="center"
-                >
-                  <Ionicons name="rocket" size={20} color="#fff" />
-                </XStack>
-                <YStack flex={1}>
-                  <Text fontSize={14} fontWeight="600" color="$brandSecondary">
-                    {t('dashboard.upgradeTitle', { price: proPrice })}
-                  </Text>
-                  <Text fontSize={12} color="$brandTextLight">
-                    {t('dashboard.upgradeSubtitle')}
-                  </Text>
-                </YStack>
-                <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+            <XStack
+              borderRadius={16}
+              backgroundColor="#FFF7ED"
+              borderWidth={1.5}
+              borderColor="#FDBA74"
+              padding="$3.5"
+              alignItems="center"
+              gap="$3"
+            >
+              <XStack
+                width={44}
+                height={44}
+                borderRadius={14}
+                backgroundColor="#F97316"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <Ionicons name="rocket" size={20} color="#fff" />
               </XStack>
-            </Card>
+              <YStack flex={1}>
+                <Text fontSize={14} fontWeight="700" color="#92400E">
+                  {t('dashboard.upgradeTitle', { price: proPrice })}
+                </Text>
+                <Text fontSize={12} color="#B45309">
+                  {t('dashboard.upgradeSubtitle')}
+                </Text>
+              </YStack>
+              <Ionicons name="chevron-forward" size={18} color="#F97316" />
+            </XStack>
           </Pressable>
         )}
 
         <Card variant="outlined" gap="$3">
-          <Text fontSize={15} fontWeight="600" color="$brandSecondary">
+          <Text fontSize={11} fontWeight="700" color="$brandTextLight" letterSpacing={1.0} textTransform="uppercase">
             {t('dashboard.usageTitle')}
           </Text>
           <UsageBar
@@ -174,74 +182,88 @@ export default function DashboardScreen() {
           />
         </Card>
 
-        <Text fontSize={18} fontWeight="600" color="$brandSecondary" marginTop="$2">
+        <Text
+          fontSize={11}
+          fontWeight="700"
+          color="$brandTextLight"
+          letterSpacing={1.0}
+          textTransform="uppercase"
+          marginTop="$2"
+        >
           {t('dashboard.quickActions')}
         </Text>
         <XStack gap="$3">
           <Pressable style={{ flex: 1 }} onPress={() => router.push('/(app)/generate-post')}>
-            <Card variant="elevated" flex={1} alignItems="center" gap="$2" padding="$4">
+            <Card variant="elevated" flex={1} alignItems="center" gap="$2.5" padding="$4">
               <XStack
-                width={48}
-                height={48}
-                borderRadius={24}
+                width={52}
+                height={52}
+                borderRadius={16}
                 backgroundColor="$brandPrimary"
                 justifyContent="center"
                 alignItems="center"
               >
                 <Ionicons name="sparkles" size={24} color="#fff" />
               </XStack>
-              <Text fontSize={13} fontWeight="500" textAlign="center" color="$brandText">
+              <Text fontSize={12} fontWeight="600" textAlign="center" color="$brandText" letterSpacing={0.1}>
                 {t('dashboard.generatePost')}
               </Text>
             </Card>
           </Pressable>
           <Pressable style={{ flex: 1 }} onPress={() => router.push('/(app)/(tabs)/leads')}>
-            <Card variant="elevated" flex={1} alignItems="center" gap="$2" padding="$4">
+            <Card variant="elevated" flex={1} alignItems="center" gap="$2.5" padding="$4">
               <XStack
-                width={48}
-                height={48}
-                borderRadius={24}
+                width={52}
+                height={52}
+                borderRadius={16}
                 backgroundColor="$brandAccent"
                 justifyContent="center"
                 alignItems="center"
               >
                 <Ionicons name="people" size={24} color="#fff" />
               </XStack>
-              <Text fontSize={13} fontWeight="500" textAlign="center" color="$brandText">
+              <Text fontSize={12} fontWeight="600" textAlign="center" color="$brandText" letterSpacing={0.1}>
                 {t('dashboard.viewLeads')}
               </Text>
             </Card>
           </Pressable>
         </XStack>
 
-        <Text fontSize={18} fontWeight="600" color="$brandSecondary" marginTop="$2">
+        <Text
+          fontSize={11}
+          fontWeight="700"
+          color="$brandTextLight"
+          letterSpacing={1.0}
+          textTransform="uppercase"
+          marginTop="$2"
+        >
           {t('dashboard.summary')}
         </Text>
-        <Card variant="outlined" gap="$3">
-          <XStack justifyContent="space-between" alignItems="center">
-            <YStack>
-              <Text fontSize={14} color="$brandTextLight">
-                {t('dashboard.newLeads')}
-              </Text>
-              <Text fontSize={28} fontWeight="bold" color="$brandPrimary">
+        <Card variant="outlined" padding="$4">
+          <XStack justifyContent="space-around" alignItems="center">
+            <YStack alignItems="center" gap="$1">
+              <Text fontSize={34} fontWeight="800" color="$brandPrimary" letterSpacing={-1}>
                 {usage.leadsStored}
               </Text>
+              <XStack alignItems="center" gap="$1">
+                <Ionicons name="trending-up" size={14} color="#0F766E" />
+                <Text fontSize={12} color="$brandTextLight">
+                  {t('dashboard.newLeads')}
+                </Text>
+              </XStack>
             </YStack>
-            <Ionicons name="trending-up" size={32} color="#0F766E" />
-          </XStack>
-        </Card>
-
-        <Card variant="outlined" gap="$3">
-          <XStack justifyContent="space-between" alignItems="center">
-            <YStack>
-              <Text fontSize={14} color="$brandTextLight">
-                {t('dashboard.postsThisMonth')}
-              </Text>
-              <Text fontSize={28} fontWeight="bold" color="$brandSecondary">
+            <YStack width={1} height={48} backgroundColor="$brandBorder" />
+            <YStack alignItems="center" gap="$1">
+              <Text fontSize={34} fontWeight="800" color="$brandSecondary" letterSpacing={-1}>
                 {usage.postsGenerated}
               </Text>
+              <XStack alignItems="center" gap="$1">
+                <Ionicons name="calendar-outline" size={14} color="#6B7280" />
+                <Text fontSize={12} color="$brandTextLight">
+                  {t('dashboard.postsThisMonth')}
+                </Text>
+              </XStack>
             </YStack>
-            <Ionicons name="calendar-outline" size={32} color="#6B7280" />
           </XStack>
         </Card>
       </YStack>

@@ -45,35 +45,37 @@ export default function SettingsScreen() {
   };
 
   return (
-    <YStack flex={1} padding="$5" gap="$4">
-      <Card variant="elevated" gap="$3">
-        <XStack gap="$4" alignItems="center">
+    <YStack flex={1} padding="$4" gap="$3">
+      <Card variant="elevated" padding="$4">
+        <XStack gap="$3.5" alignItems="center">
           {profile?.logo_url ? (
             <Image
               source={{ uri: profile.logo_url }}
-              style={{ width: 60, height: 60, borderRadius: 30 }}
+              style={{ width: 56, height: 56, borderRadius: 16 }}
             />
           ) : (
             <XStack
-              width={60}
-              height={60}
-              borderRadius={30}
+              width={56}
+              height={56}
+              borderRadius={16}
               backgroundColor="$brandPrimary"
               justifyContent="center"
               alignItems="center"
             >
-              <Text fontSize={24} fontWeight="bold" color="$brandTextInverse">
+              <Text fontSize={22} fontWeight="800" color="$brandTextInverse">
                 {profile?.business_name?.[0]?.toUpperCase() ?? 'V'}
               </Text>
             </XStack>
           )}
-          <YStack flex={1}>
-            <Text fontSize={18} fontWeight="bold" color="$brandSecondary">
+          <YStack flex={1} gap="$0.5">
+            <Text fontSize={17} fontWeight="700" color="$brandSecondary" letterSpacing={-0.3}>
               {profile?.business_name ?? t('dashboard.yourBusiness')}
             </Text>
-            <Text fontSize={14} color="$brandTextLight">
-              {profile?.business_type ?? ''}
-            </Text>
+            {profile?.business_type ? (
+              <Text fontSize={13} color="$brandTextLight">
+                {profile.business_type}
+              </Text>
+            ) : null}
             <Text fontSize={12} color="$brandTextLight">
               {user?.email ?? ''}
             </Text>
@@ -81,7 +83,7 @@ export default function SettingsScreen() {
         </XStack>
       </Card>
 
-      <Card variant="outlined" padding="$0">
+      <Card variant="outlined" padding="$0" overflow="hidden">
         <SettingsRow
           icon="business-outline"
           label={t('settings.editBusiness')}
@@ -113,11 +115,11 @@ export default function SettingsScreen() {
         />
       </Card>
 
-      <Button variant="outline" onPress={handleSignOut} marginTop="$4">
+      <Button variant="outline" onPress={handleSignOut} marginTop="$2">
         {t('settings.signOut')}
       </Button>
 
-      <Text fontSize={12} color="$brandTextLight" textAlign="center" marginTop="$2">
+      <Text fontSize={11} color="$brandTextLight" textAlign="center" letterSpacing={0.3}>
         {t('settings.version')}
       </Text>
 
@@ -163,6 +165,13 @@ export default function SettingsScreen() {
   );
 }
 
+const ICON_BG_COLORS: Partial<Record<string, string>> = {
+  'business-outline': '#0F766E',
+  'card-outline': '#7C3AED',
+  'notifications-outline': '#EF4444',
+  'language-outline': '#2563EB',
+};
+
 function SettingsRow({
   icon,
   label,
@@ -178,40 +187,51 @@ function SettingsRow({
   value?: string;
   onPress: () => void;
 }) {
+  const iconBg = ICON_BG_COLORS[icon as string] ?? '#6B7280';
+
   return (
     <XStack
       paddingHorizontal="$4"
-      paddingVertical="$3.5"
+      paddingVertical="$3"
       justifyContent="space-between"
       alignItems="center"
       pressStyle={{ backgroundColor: '$brandBackground' }}
       onPress={onPress}
     >
       <XStack gap="$3" alignItems="center">
-        <Ionicons name={icon} size={22} color="#6B7280" />
-        <Text fontSize={16} color="$brandText">
+        <XStack
+          width={32}
+          height={32}
+          borderRadius={9}
+          backgroundColor={iconBg}
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Ionicons name={icon} size={17} color="#FFFFFF" />
+        </XStack>
+        <Text fontSize={15} color="$brandText" fontWeight="400">
           {label}
         </Text>
         {badge && (
           <XStack
             paddingHorizontal={8}
-            paddingVertical={2}
+            paddingVertical={3}
             borderRadius={6}
             backgroundColor={badgeColor ?? '#6B7280'}
           >
-            <Text fontSize={11} fontWeight="bold" color="$brandTextInverse">
+            <Text fontSize={10} fontWeight="700" color="$brandTextInverse" letterSpacing={0.5}>
               {badge.toUpperCase()}
             </Text>
           </XStack>
         )}
       </XStack>
-      <XStack alignItems="center" gap="$2">
+      <XStack alignItems="center" gap="$1.5">
         {value && (
-          <Text fontSize={14} color="$brandTextLight">
+          <Text fontSize={13} color="$brandTextLight">
             {value}
           </Text>
         )}
-        <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+        <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
       </XStack>
     </XStack>
   );

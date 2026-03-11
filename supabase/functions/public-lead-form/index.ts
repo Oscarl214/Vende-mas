@@ -53,15 +53,19 @@ Deno.serve(async (req) => {
       return json({ closed: true, error: "Form is temporarily unavailable" });
     }
 
-    await supabase.from("leads").insert({
-      user_id: userId,
-      name,
-      phone,
-      email,
-      source_post_id: sourcePostId,
-      event_date: eventDate,
-      status: "new",
-    });
+    const { data: insertedLead } = await supabase
+      .from("leads")
+      .insert({
+        user_id: userId,
+        name,
+        phone,
+        email,
+        source_post_id: sourcePostId,
+        event_date: eventDate,
+        status: "new",
+      })
+      .select("id")
+      .single();
 
     await supabase.rpc("increment_lead_count", {
       p_user_id: userId,
@@ -75,12 +79,13 @@ Deno.serve(async (req) => {
         .eq("user_id", userId);
 
       if (tokens && tokens.length > 0) {
+        const leadId = insertedLead?.id ?? null;
         const messages = tokens.map((row: { token: string }) => ({
           to: row.token,
           sound: "default",
           title: "New Lead",
           body: `${name} requested a quote.`,
-          data: { type: "new_lead" },
+          data: { type: "new_lead", leadId },
         }));
 
         await fetch("https://exp.host/--/api/v2/push/send", {

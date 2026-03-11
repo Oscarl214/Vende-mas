@@ -15,7 +15,10 @@
       "tagline": "Genera más clientes\npara tu negocio",
       "taglineSub": "Generate more leads for your business",
       "createAccount": "Crear cuenta",
-      "signIn": "Iniciar sesión"
+      "signIn": "Iniciar sesión",
+      "featureAI": "Generador AI de Posts",
+      "featureLeads": "Seguimiento de Leads",
+      "featureGrowth": "Crecimiento de Negocio"
     },
     "signIn": {
       "title": "Iniciar sesión",
@@ -363,9 +366,34 @@
       "free": "Gratis",
       "pro": "Pro"
     },
+    "whatsIncluded": "Qué incluye",
+    "priceCurrency": "$",
+    "priceAmount": "39",
     "price": "$39",
     "pricePerMonth": "/mes",
     "cancelAnytime": "Cancela cuando quieras",
+    "benefits": {
+      "aiPosts": {
+        "label": "Posts AI Ilimitados",
+        "desc": "Gratis incluye 10/mes — Pro sin límites"
+      },
+      "leads": {
+        "label": "Leads Ilimitados",
+        "desc": "Gratis incluye 20 leads — Pro los guarda todos"
+      },
+      "aiFollowUp": {
+        "label": "Seguimiento AI",
+        "desc": "Mensajes personalizados generados por AI"
+      },
+      "reminders": {
+        "label": "Recordatorios de seguimiento",
+        "desc": "Nunca pierdas un cliente potencial"
+      },
+      "sms": {
+        "label": "Automatización SMS",
+        "desc": "Llega a clientes automáticamente por mensaje"
+      }
+    },
     "subscribing": "Procesando...",
     "subscribe": "Suscribirse por {{price}}",
     "restoring": "Restaurando...",

@@ -2,8 +2,8 @@ export type Tier = 'free' | 'pro';
 
 export const TIERS = {
   free: {
-    postsPerMonth: 3,
-    maxLeads: 5,
+    postsPerMonth: 10,
+    maxLeads: 20,
     hasAutomation: false,
     hasAiFollowUps: false,
     hasSmsAutomation: false,
