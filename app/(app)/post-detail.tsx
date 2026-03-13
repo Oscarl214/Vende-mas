@@ -13,6 +13,7 @@ import { useSession } from '@/hooks/use-session';
 import { getPost, archivePost, unarchivePost, type Post } from '@/lib/posts';
 import { getLeadsByPost, type Lead, type LeadStatus } from '@/lib/leads';
 import { getEffectiveBookingUrl } from '@/lib/booking';
+import { useBrandTheme } from '@/hooks/use-brand-theme';
 
 const PLATFORM_ICONS: Record<string, string> = {
   facebook: 'logo-facebook',
@@ -64,6 +65,8 @@ export default function PostDetailScreen() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedField, setCopiedField] = useState<string | null>(null);
+
+  const brand = useBrandTheme();
 
   const lang = profile?.default_language ?? 'es';
 
@@ -175,8 +178,8 @@ export default function PostDetailScreen() {
               alignItems="center"
               gap="$1.5"
             >
-              <Ionicons name={iconName as any} size={12} color="#0F766E" />
-              <Text fontSize={11} fontWeight="600" color="$brandPrimary">
+            <Ionicons name={iconName as any} size={12} color={brand.primary} />
+            <Text fontSize={11} fontWeight="600" color={brand.primary}>
                 {t('contentEngine.optimizedFor', {
                   platform: platform.replace('_', ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
                 })}
@@ -201,7 +204,7 @@ export default function PostDetailScreen() {
               <Ionicons
                 name={copiedField === 'post' ? 'checkmark-circle' : 'copy-outline'}
                 size={18}
-                color={copiedField === 'post' ? '#16A34A' : '#0F766E'}
+                color={copiedField === 'post' ? '#16A34A' : brand.primary}
               />
             }
           >

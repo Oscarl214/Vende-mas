@@ -15,7 +15,7 @@ export function buildFormUrl(
   return url;
 }
 
-/**
+/*`
  * Returns a slug-based smart link: e.g. https://app.com/r/vidabebidas
  * If postId is provided, appends ?post= for per-post tracking.
  */

@@ -18,6 +18,7 @@ import { getPost, type Post } from '@/lib/posts';
 import { generateFollowUp } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
 import { markMilestone } from '@/lib/onboarding';
+import { useBrandTheme } from '@/hooks/use-brand-theme';
 
 const PLATFORM_ICONS: Record<string, string> = {
   facebook: 'logo-facebook',
@@ -64,6 +65,7 @@ export default function LeadDetailScreen() {
   const { user, profile } = useSession();
   const { tier } = useSubscription();
   const tierLimits = TIERS[tier];
+  const brand = useBrandTheme();
 
   const { id: leadId } = useLocalSearchParams<{ id: string }>();
 
@@ -336,8 +338,8 @@ export default function LeadDetailScreen() {
           {lead.phone && (
             <Pressable onPress={handleCall}>
               <XStack alignItems="center" gap="$2.5" paddingVertical="$1">
-                <Ionicons name="call-outline" size={18} color="#0F766E" />
-                <Text fontSize={15} color="$brandPrimary">
+            <Ionicons name="call-outline" size={18} color={brand.primary} />
+            <Text fontSize={15} color={brand.primary}>
                   {lead.phone}
                 </Text>
               </XStack>
@@ -466,7 +468,7 @@ export default function LeadDetailScreen() {
         {/* AI Follow-Up Section */}
         <YStack gap="$2" marginTop="$2">
           <XStack alignItems="center" gap="$2">
-            <Ionicons name="sparkles" size={18} color="#0F766E" />
+            <Ionicons name="sparkles" size={18} color={brand.primary} />
             <Text fontSize={15} fontWeight="600" color="$brandSecondary">
               {t('leadDetail.followUp')}
             </Text>
@@ -475,7 +477,7 @@ export default function LeadDetailScreen() {
           {!tierLimits.hasAiFollowUps ? (
             <YStack gap="$4">
               <Card variant="outlined" borderColor="$brandAccent" gap="$3" alignItems="center" padding="$4">
-                <Ionicons name="lock-closed" size={28} color="#F97316" />
+                <Ionicons name="lock-closed" size={28} color={brand.accent} />
                 <Text fontSize={15} fontWeight="600" color="$brandSecondary" textAlign="center">
                   {t('leadDetail.proOnly')}
                 </Text>
@@ -526,7 +528,7 @@ export default function LeadDetailScreen() {
                         <Ionicons
                           name={copied ? 'checkmark-circle' : 'copy-outline'}
                           size={16}
-                          color={copied ? '#16A34A' : '#0F766E'}
+                          color={copied ? '#16A34A' : brand.primary}
                         />
                         <Text
                           fontSize={13}
@@ -586,7 +588,7 @@ export default function LeadDetailScreen() {
                 disabled={generatingFollowUp}
                 icon={
                   !generatingFollowUp ? (
-                    <Ionicons name="sparkles" size={18} color="#0F766E" />
+                    <Ionicons name="sparkles" size={18} color={brand.primary} />
                   ) : undefined
                 }
               >
@@ -630,7 +632,7 @@ export default function LeadDetailScreen() {
                         <Ionicons
                           name={copied ? 'checkmark-circle' : 'copy-outline'}
                           size={16}
-                          color={copied ? '#16A34A' : '#0F766E'}
+                          color={copied ? '#16A34A' : brand.primary}
                         />
                         <Text
                           fontSize={13}

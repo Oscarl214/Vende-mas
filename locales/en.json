@@ -12,13 +12,13 @@
   },
   "auth": {
     "welcome": {
-      "tagline": "Generate more leads\nfor your business",
-      "taglineSub": "Genera más clientes para tu negocio",
+      "tagline": "Know which posts\nmake you money",
+      "taglineSub": "Sabe qué posts te generan dinero",
       "createAccount": "Create Account",
       "signIn": "Sign In",
-      "featureAI": "AI Post Generator",
-      "featureLeads": "Lead Tracking",
-      "featureGrowth": "Business Growth"
+      "featureAI": "Revenue Tracking",
+      "featureLeads": "Lead Capture",
+      "featureGrowth": "AI Content"
     },
     "signIn": {
       "title": "Sign In",
@@ -220,9 +220,10 @@
     "quickActions": "Quick actions",
     "generatePost": "Generate AI Post",
     "viewLeads": "View Leads",
-    "summary": "Summary",
-    "newLeads": "New leads",
-    "postsThisMonth": "Posts this month"
+    "summary": "This month",
+    "leadsThisMonth": "Leads",
+    "bookingsThisMonth": "Bookings",
+    "postsThisMonth": "Posts"
   },
   "leads": {
     "fromPost": "From post",
@@ -487,7 +488,10 @@
     "archive": "Archive",
     "archivedEmptyTitle": "No archived posts",
     "archivedEmpty": "Archived posts will appear here when you archive them from the Active list.",
-    "unarchive": "Unarchive"
+    "unarchive": "Unarchive",
+    "sortRecent": "Recent",
+    "sortTop": "Top Posts",
+    "revenue": "${{amount}} revenue"
   },
   "postDetail": {
     "title": "Post Performance",
@@ -508,15 +512,17 @@
     "confirmArchiveMessage": "You can restore it from the Archive tab anytime."
   },
   "onboarding": {
-    "engineReady": "Your AI Growth Engine is ready",
+    "engineReady": "Your revenue tracker is ready",
     "continue": "Continue",
-    "slide1Title": "Create AI Posts",
-    "slide1Subtitle": "Generate social media posts for your business in seconds.",
-    "slide2Title": "Capture Leads",
-    "slide2Subtitle": "Each post includes a smart link that collects customer messages.",
-    "slide3Title": "Track Revenue",
-    "slide3Subtitle": "See which posts bring you leads and real bookings.",
-    "createFirstPost": "Create My First Post",
+    "slide1Title": "Know What Makes You Money",
+    "slide1Subtitle": "VendeMás tracks every post from click to booking — so you always know which content brings real customers.",
+    "slide2Title": "Every Post Captures Leads",
+    "slide2Subtitle": "Each post gets a smart link. When someone taps it, their info goes straight to your leads list — no DMs lost.",
+    "slide3Title": "Close More Bookings",
+    "slide3Subtitle": "Follow up instantly via WhatsApp, SMS, or Email. AI writes the perfect message so nobody slips through.",
+    "slide4Title": "See Your ROI, Post by Post",
+    "slide4Subtitle": "Log the revenue from each booking and see exactly which posts paid off. Stop guessing what works.",
+    "createFirstPost": "Create My First Tracked Post",
     "guidedPromptHint": "Describe your promotion and AI will create the post.",
     "defaultPromotion": "10% off first service this week for new customers",
     "creatingPost": "Creating your post...",

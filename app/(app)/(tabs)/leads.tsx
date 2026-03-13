@@ -31,6 +31,7 @@ import {
 import { getPosts, type Post } from '@/lib/posts';
 import { getEffectiveBookingUrl } from '@/lib/booking';
 import { markMilestone } from '@/lib/onboarding';
+import { useBrandTheme } from '@/hooks/use-brand-theme';
 
 const PLATFORM_ICONS: Record<string, string> = {
   facebook: 'logo-facebook',
@@ -75,6 +76,7 @@ export default function LeadsScreen() {
   const { t } = useTranslation();
   const { user, profile } = useSession();
   const { tier, usage, canStoreLead, refreshUsage } = useSubscription();
+  const brand = useBrandTheme();
   const limits = TIERS[tier];
   const atLimit = !canStoreLead;
   const proPrice = t('tiers.proPrice');
@@ -384,9 +386,14 @@ export default function LeadsScreen() {
       {/* Pro: follow-up reminder banner */}
       {showFollowUpReminders && (
         <Pressable onPress={() => setFilter('needsFollowUp')}>
-          <Card variant="outlined" borderColor="#EAB308" padding="$2.5" backgroundColor="#FEF9C3">
+          <Card
+            variant="outlined"
+            borderColor={brand.accent}
+            padding="$2.5"
+            backgroundColor={brand.accentSoftBg}
+          >
             <XStack alignItems="center" gap="$2">
-              <Ionicons name="notifications" size={20} color="#B45309" />
+              <Ionicons name="notifications" size={20} color={brand.accent} />
               <Text fontSize={14} fontWeight="500" color="$brandSecondary" flex={1}>
                 {t('leads.followUpReminderBanner', { count: leadsNeedingFollowUp.length })}
               </Text>
@@ -408,10 +415,10 @@ export default function LeadsScreen() {
               paddingHorizontal="$3"
               paddingVertical="$2"
               borderRadius={10}
-              backgroundColor="$brandPrimary"
+              backgroundColor={brand.primary}
             >
-              <Ionicons name="share-outline" size={15} color="#fff" />
-              <Text fontSize={13} fontWeight="600" color="$brandTextInverse">
+              <Ionicons name="share-outline" size={15} color={brand.onPrimary} />
+              <Text fontSize={13} fontWeight="600" color={brand.onPrimary}>
                 {t('leads.shareFormLink')}
               </Text>
             </XStack>
@@ -429,11 +436,11 @@ export default function LeadsScreen() {
               width={36}
               height={36}
               borderRadius={12}
-              backgroundColor="$brandAccent"
+                backgroundColor={brand.accent}
               justifyContent="center"
               alignItems="center"
             >
-              <Ionicons name="add" size={22} color="#fff" />
+                <Ionicons name="add" size={22} color={brand.onPrimary} />
             </XStack>
           </Pressable>
         </XStack>

@@ -32,9 +32,15 @@ const SLIDES: Slide[] = [
     color: '#F97316',
   },
   {
-    icon: 'trending-up',
+    icon: 'chatbubbles',
     titleKey: 'onboarding.slide3Title',
     subtitleKey: 'onboarding.slide3Subtitle',
+    color: '#8B5CF6',
+  },
+  {
+    icon: 'trending-up',
+    titleKey: 'onboarding.slide4Title',
+    subtitleKey: 'onboarding.slide4Subtitle',
     color: '#2563EB',
   },
 ];

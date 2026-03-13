@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useBrandTheme } from '@/hooks/use-brand-theme';
 
 const FEATURES = [
   { icon: 'sparkles' as const, labelKey: 'auth.welcome.featureAI' },
@@ -15,11 +16,12 @@ export default function WelcomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const brand = useBrandTheme();
 
   return (
     <YStack
       flex={1}
-      backgroundColor="$brandBackground"
+        backgroundColor="$brandBackground"
       paddingTop={insets.top}
       paddingBottom={insets.bottom + 8}
     >
@@ -31,24 +33,24 @@ export default function WelcomeScreen() {
             width={88}
             height={88}
             borderRadius={26}
-            backgroundColor="$brandPrimary"
+            backgroundColor={brand.primary}
             justifyContent="center"
             alignItems="center"
             style={{
-              shadowColor: '#0F766E',
+              shadowColor: brand.primary,
               shadowOpacity: 0.35,
               shadowRadius: 24,
               shadowOffset: { width: 0, height: 10 },
             }}
           >
-            <Text fontSize={40} color="$brandTextInverse" fontWeight="800" letterSpacing={-2}>
+            <Text fontSize={40} color={brand.onPrimary} fontWeight="800" letterSpacing={-2}>
               V
             </Text>
           </View>
           <Text
             fontSize={11}
             fontWeight="700"
-            color="$brandPrimary"
+            color={brand.primary}
             letterSpacing={4}
             textTransform="uppercase"
           >
@@ -85,13 +87,13 @@ export default function WelcomeScreen() {
               key={labelKey}
               alignItems="center"
               gap="$1.5"
-              backgroundColor="rgba(15,118,110,0.1)"
+              backgroundColor={brand.primarySoftBg}
               paddingHorizontal="$3"
               paddingVertical="$2"
               borderRadius={20}
             >
-              <Ionicons name={icon} size={13} color="#0F766E" />
-              <Text fontSize={12} fontWeight="600" color="$brandPrimary">
+              <Ionicons name={icon} size={13} color={brand.primaryDark} />
+              <Text fontSize={12} fontWeight="600" color={brand.primary}>
                 {t(labelKey)}
               </Text>
             </XStack>
@@ -104,6 +106,9 @@ export default function WelcomeScreen() {
         <Button
           variant="primary"
           height={54}
+          backgroundColor={brand.primary}
+          color={brand.onPrimary}
+          hoverStyle={{ backgroundColor: brand.primaryDark }}
           onPress={() => router.push('/(auth)/sign-up')}
         >
           {t('auth.welcome.createAccount')}
@@ -112,6 +117,8 @@ export default function WelcomeScreen() {
         <Button
           variant="outline"
           height={50}
+          borderColor={brand.primary}
+          color={brand.primary}
           onPress={() => router.push('/(auth)/sign-in')}
         >
           {t('auth.welcome.signIn')}

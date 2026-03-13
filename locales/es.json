@@ -12,13 +12,13 @@
   },
   "auth": {
     "welcome": {
-      "tagline": "Genera más clientes\npara tu negocio",
-      "taglineSub": "Generate more leads for your business",
+      "tagline": "Sabe qué posts\nte generan dinero",
+      "taglineSub": "Know which posts make you money",
       "createAccount": "Crear cuenta",
       "signIn": "Iniciar sesión",
-      "featureAI": "Generador AI de Posts",
-      "featureLeads": "Seguimiento de Leads",
-      "featureGrowth": "Crecimiento de Negocio"
+      "featureAI": "Seguimiento de Ingresos",
+      "featureLeads": "Captura de Leads",
+      "featureGrowth": "Contenido AI"
     },
     "signIn": {
       "title": "Iniciar sesión",
@@ -220,9 +220,10 @@
     "quickActions": "Acciones rápidas",
     "generatePost": "Generar Post AI",
     "viewLeads": "Ver Leads",
-    "summary": "Resumen",
-    "newLeads": "Nuevos leads",
-    "postsThisMonth": "Posts este mes"
+    "summary": "Este mes",
+    "leadsThisMonth": "Leads",
+    "bookingsThisMonth": "Reservas",
+    "postsThisMonth": "Posts"
   },
   "leads": {
     "fromPost": "Del post",
@@ -487,7 +488,10 @@
     "archive": "Archivo",
     "archivedEmptyTitle": "No hay posts archivados",
     "archivedEmpty": "Los posts archivados aparecerán aquí cuando los archives desde la lista Activos.",
-    "unarchive": "Desarchivar"
+    "unarchive": "Desarchivar",
+    "sortRecent": "Recientes",
+    "sortTop": "Mejores Posts",
+    "revenue": "${{amount}} ingresos"
   },
   "postDetail": {
     "title": "Rendimiento del Post",
@@ -508,15 +512,17 @@
     "confirmArchiveMessage": "Puedes restaurarlo desde la pestaña Archivo en cualquier momento."
   },
   "onboarding": {
-    "engineReady": "Tu Motor de Crecimiento AI está listo",
+    "engineReady": "Tu rastreador de ingresos está listo",
     "continue": "Continuar",
-    "slide1Title": "Crea Posts con AI",
-    "slide1Subtitle": "Genera publicaciones para tu negocio en segundos.",
-    "slide2Title": "Captura Leads",
-    "slide2Subtitle": "Cada post incluye un enlace inteligente que recoge mensajes de clientes.",
-    "slide3Title": "Rastrea Ingresos",
-    "slide3Subtitle": "Ve qué posts te traen leads y reservas reales.",
-    "createFirstPost": "Crear Mi Primer Post",
+    "slide1Title": "Sabe Qué Te Genera Dinero",
+    "slide1Subtitle": "VendeMás rastrea cada post desde el clic hasta la reserva — para que siempre sepas qué contenido trae clientes reales.",
+    "slide2Title": "Cada Post Captura Leads",
+    "slide2Subtitle": "Cada post tiene un enlace inteligente. Cuando alguien lo toca, su información llega directo a tu lista — sin perder ningún mensaje.",
+    "slide3Title": "Cierra Más Reservas",
+    "slide3Subtitle": "Da seguimiento por WhatsApp, SMS o Email. La AI escribe el mensaje perfecto para que ningún lead se escape.",
+    "slide4Title": "Ve Tu ROI Post por Post",
+    "slide4Subtitle": "Registra el ingreso de cada reserva y ve exactamente qué posts valieron la pena. Deja de adivinar qué funciona.",
+    "createFirstPost": "Crear Mi Primer Post Rastreado",
     "guidedPromptHint": "Describe tu promoción y la AI creará el post.",
     "defaultPromotion": "10% de descuento en el primer servicio esta semana para nuevos clientes",
     "creatingPost": "Creando tu post...",

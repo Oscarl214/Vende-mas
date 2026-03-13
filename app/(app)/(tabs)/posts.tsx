@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { getPosts, archivePost, unarchivePost, type Post } from '@/lib/posts';
 import { getLeads, type Lead } from '@/lib/leads';
 import { getEffectiveBookingUrl } from '@/lib/booking';
+import { useBrandTheme } from '@/hooks/use-brand-theme';
 
 const PLATFORM_ICONS: Record<string, string> = {
   facebook: 'logo-facebook',
@@ -37,16 +38,20 @@ function truncateCaption(text: string): string {
 }
 
 type PostFilter = 'active' | 'archive';
+type PostSort = 'recent' | 'top';
 
 export default function PostsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { user, profile } = useSession();
   const [postFilter, setPostFilter] = useState<PostFilter>('active');
+  const [postSort, setPostSort] = useState<PostSort>('recent');
   const [posts, setPosts] = useState<Post[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const brand = useBrandTheme();
 
   const lang = profile?.default_language ?? 'es';
 
@@ -83,6 +88,24 @@ export default function PostsScreen() {
     [leads],
   );
 
+  const revenueByPost = useCallback(
+    (postId: string) =>
+      leads
+        .filter((l) => l.source_post_id === postId)
+        .reduce((sum, l) => sum + (l.revenue ?? 0), 0),
+    [leads],
+  );
+
+  const sortedPosts = postSort === 'top'
+    ? [...posts].sort((a, b) => {
+        const leadDiff = leadCountByPost(b.id) - leadCountByPost(a.id);
+        if (leadDiff !== 0) return leadDiff;
+        const clickDiff = (b.click_count ?? 0) - (a.click_count ?? 0);
+        if (clickDiff !== 0) return clickDiff;
+        return revenueByPost(b.id) - revenueByPost(a.id);
+      })
+    : posts;
+
   const handleArchive = useCallback(async (post: Post) => {
     try {
       await archivePost(post.id);
@@ -114,13 +137,16 @@ export default function PostsScreen() {
       ? getEffectiveBookingUrl(profile, user.id, post.id)
       : '';
 
-  const renderItem = ({ item: post }: { item: Post }) => {
+  const renderItem = ({ item: post, index }: { item: Post; index: number }) => {
     const platform = post.platform ?? 'instagram';
     const iconName = PLATFORM_ICONS[platform] ?? 'document-text';
     const clicks = post.click_count ?? 0;
     const leadsCount = leadCountByPost(post.id);
+    const revenue = revenueByPost(post.id);
     const link = trackingLink(post);
     const isCopied = copiedId === post.id;
+    const rank = postSort === 'top' ? index + 1 : null;
+    const isTopPost = rank === 1 && leadsCount > 0;
 
     return (
       <Pressable onPress={() => router.push(`/(app)/post-detail?id=${post.id}`)}>
@@ -128,6 +154,24 @@ export default function PostsScreen() {
           {/* Platform + date row */}
           <XStack justifyContent="space-between" alignItems="center">
             <XStack alignItems="center" gap="$1.5">
+              {rank !== null && (
+                <XStack
+                  width={22}
+                  height={22}
+                  borderRadius={6}
+                  backgroundColor={isTopPost ? brand.accent : '$brandBackground'}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Text
+                    fontSize={11}
+                    fontWeight="700"
+                    color={isTopPost ? brand.onPrimary : '$brandTextLight'}
+                  >
+                    #{rank}
+                  </Text>
+                </XStack>
+              )}
               <XStack
                 width={26}
                 height={26}
@@ -164,7 +208,7 @@ export default function PostsScreen() {
             >
               <Text
                 fontSize={11}
-                color="$brandPrimary"
+                  color={brand.primary}
                 numberOfLines={1}
                 flex={1}
                 minWidth={0}
@@ -176,7 +220,7 @@ export default function PostsScreen() {
                   <Ionicons
                     name={isCopied ? 'checkmark-circle' : 'copy-outline'}
                     size={15}
-                    color={isCopied ? '#16A34A' : '#0F766E'}
+                      color={isCopied ? '#16A34A' : brand.primary}
                   />
                   <Text fontSize={12} fontWeight="600" color={isCopied ? '$brandSuccess' : '$brandPrimary'}>
                     {isCopied ? t('posts.copied') : t('posts.copyLink')}
@@ -201,6 +245,14 @@ export default function PostsScreen() {
                   {t('posts.leads', { count: leadsCount })}
                 </Text>
               </XStack>
+              {revenue > 0 && (
+                <XStack alignItems="center" gap="$1">
+                  <Ionicons name="cash-outline" size={13} color="#16A34A" />
+                  <Text fontSize={12} fontWeight="600" color="#16A34A">
+                    {t('posts.revenue', { amount: revenue.toLocaleString() })}
+                  </Text>
+                </XStack>
+              )}
             </XStack>
             <Pressable
               onPress={(e) => {
@@ -240,31 +292,69 @@ export default function PostsScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      {/* Active | Archive segment */}
-      <XStack paddingHorizontal="$4" paddingTop="$3" paddingBottom="$2" gap="$2">
-        {(['active', 'archive'] as const).map((f) => {
-          const active = postFilter === f;
-          return (
-            <Pressable key={f} onPress={() => setPostFilter(f)}>
-              <XStack
-                paddingHorizontal="$3"
-                paddingVertical="$2"
-                borderRadius={20}
-                backgroundColor={active ? '$brandPrimary' : '$brandBackground'}
-                borderWidth={active ? 0 : 1}
-                borderColor="$brandBorder"
-              >
-                <Text
-                  fontSize={13}
-                  fontWeight={active ? '600' : '400'}
-                  color={active ? '$brandTextInverse' : '$brandTextLight'}
+      {/* Active | Archive + Recent | Top sort */}
+      <XStack paddingHorizontal="$4" paddingTop="$3" paddingBottom="$2" justifyContent="space-between" alignItems="center">
+        <XStack gap="$2">
+          {(['active', 'archive'] as const).map((f) => {
+            const active = postFilter === f;
+            return (
+              <Pressable key={f} onPress={() => setPostFilter(f)}>
+                <XStack
+                  paddingHorizontal="$3"
+                  paddingVertical="$2"
+                  borderRadius={20}
+                  backgroundColor={active ? '$brandPrimary' : '$brandBackground'}
+                  borderWidth={active ? 0 : 1}
+                  borderColor="$brandBorder"
                 >
-                  {f === 'active' ? t('posts.active') : t('posts.archive')}
-                </Text>
-              </XStack>
-            </Pressable>
-          );
-        })}
+                  <Text
+                    fontSize={13}
+                    fontWeight={active ? '600' : '400'}
+                    color={active ? '$brandTextInverse' : '$brandTextLight'}
+                  >
+                    {f === 'active' ? t('posts.active') : t('posts.archive')}
+                  </Text>
+                </XStack>
+              </Pressable>
+            );
+          })}
+        </XStack>
+        {postFilter === 'active' && (
+          <XStack gap="$1.5">
+            {(['recent', 'top'] as const).map((s) => {
+              const active = postSort === s;
+              return (
+                <Pressable key={s} onPress={() => setPostSort(s)}>
+                  <XStack
+                    paddingHorizontal="$2.5"
+                    paddingVertical="$1.5"
+                    borderRadius={20}
+                    backgroundColor={active ? brand.accent : '$brandBackground'}
+                    borderWidth={active ? 0 : 1}
+                    borderColor="$brandBorder"
+                    alignItems="center"
+                    gap="$1"
+                  >
+                    {s === 'top' && (
+                      <Ionicons
+                        name="trophy-outline"
+                        size={11}
+                        color={active ? brand.onPrimary : '#9CA3AF'}
+                      />
+                    )}
+                    <Text
+                      fontSize={12}
+                      fontWeight={active ? '600' : '400'}
+                      color={active ? brand.onPrimary : '$brandTextLight'}
+                    >
+                      {s === 'recent' ? t('posts.sortRecent') : t('posts.sortTop')}
+                    </Text>
+                  </XStack>
+                </Pressable>
+              );
+            })}
+          </XStack>
+        )}
       </XStack>
 
       {loading ? (
@@ -290,7 +380,7 @@ export default function PostsScreen() {
         </YStack>
       ) : (
         <FlatList
-          data={posts}
+          data={sortedPosts}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
           contentContainerStyle={{ padding: 20, paddingBottom: 40 }}

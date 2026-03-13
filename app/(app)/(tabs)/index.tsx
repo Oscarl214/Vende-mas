@@ -11,6 +11,8 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Ionicons } from '@expo/vector-icons';
 import { getGrowthChecklist, isChecklistComplete, type GrowthChecklist } from '@/lib/onboarding';
+import { useBrandTheme } from '@/hooks/use-brand-theme';
+import { getDashboardStats, type DashboardStats } from '@/lib/dashboard';
 
 function UsageBar({
   label,
@@ -61,16 +63,21 @@ export default function DashboardScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { t } = useTranslation();
+  const brand = useBrandTheme();
   const limits = TIERS[tier];
   const proPrice = t('tiers.proPrice');
   const [checklist, setChecklist] = useState<GrowthChecklist | null>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const showChecklist = checklist !== null && !isChecklistComplete(checklist);
 
   useFocusEffect(
     useCallback(() => {
       refreshUsage();
       getGrowthChecklist().then(setChecklist);
-    }, [refreshUsage]),
+      if (profile?.id) {
+        getDashboardStats(profile.id).then(setStats).catch(() => {});
+      }
+    }, [refreshUsage, profile?.id]),
   );
 
   return (
@@ -91,14 +98,14 @@ export default function DashboardScreen() {
             paddingHorizontal={10}
             paddingVertical={5}
             borderRadius={20}
-            backgroundColor={tier === 'pro' ? '#F97316' : '#F3F4F6'}
+            backgroundColor={tier === 'pro' ? brand.accent : '$brandBackground'}
             marginTop="$1"
           >
             <Text
               fontSize={11}
               fontWeight="700"
               letterSpacing={0.5}
-              color={tier === 'pro' ? '#FFFFFF' : '#6B7280'}
+              color={tier === 'pro' ? brand.onPrimary : '$brandTextLight'}
             >
               {tier === 'pro' ? t('dashboard.pro').toUpperCase() : t('dashboard.free').toUpperCase()}
             </Text>
@@ -136,9 +143,9 @@ export default function DashboardScreen() {
           <Pressable onPress={() => router.push('/(app)/paywall')}>
             <XStack
               borderRadius={16}
-              backgroundColor="#FFF7ED"
+              backgroundColor="$brandBackground"
               borderWidth={1.5}
-              borderColor="#FDBA74"
+              borderColor={brand.accent}
               padding="$3.5"
               alignItems="center"
               gap="$3"
@@ -147,21 +154,21 @@ export default function DashboardScreen() {
                 width={44}
                 height={44}
                 borderRadius={14}
-                backgroundColor="#F97316"
+                backgroundColor={brand.accent}
                 justifyContent="center"
                 alignItems="center"
               >
-                <Ionicons name="rocket" size={20} color="#fff" />
+                <Ionicons name="rocket" size={20} color={brand.onPrimary} />
               </XStack>
               <YStack flex={1}>
-                <Text fontSize={14} fontWeight="700" color="#92400E">
+                <Text fontSize={14} fontWeight="700" color="$brandSecondary">
                   {t('dashboard.upgradeTitle', { price: proPrice })}
                 </Text>
-                <Text fontSize={12} color="#B45309">
+                <Text fontSize={12} color="$brandTextLight">
                   {t('dashboard.upgradeSubtitle')}
                 </Text>
               </YStack>
-              <Ionicons name="chevron-forward" size={18} color="#F97316" />
+              <Ionicons name="chevron-forward" size={18} color={brand.accent} />
             </XStack>
           </Pressable>
         )}
@@ -199,11 +206,11 @@ export default function DashboardScreen() {
                 width={52}
                 height={52}
                 borderRadius={16}
-                backgroundColor="$brandPrimary"
+                backgroundColor={brand.primary}
                 justifyContent="center"
                 alignItems="center"
               >
-                <Ionicons name="sparkles" size={24} color="#fff" />
+                <Ionicons name="sparkles" size={24} color={brand.onPrimary} />
               </XStack>
               <Text fontSize={12} fontWeight="600" textAlign="center" color="$brandText" letterSpacing={0.1}>
                 {t('dashboard.generatePost')}
@@ -216,11 +223,11 @@ export default function DashboardScreen() {
                 width={52}
                 height={52}
                 borderRadius={16}
-                backgroundColor="$brandAccent"
+                backgroundColor={brand.accent}
                 justifyContent="center"
                 alignItems="center"
               >
-                <Ionicons name="people" size={24} color="#fff" />
+                <Ionicons name="people" size={24} color={brand.onPrimary} />
               </XStack>
               <Text fontSize={12} fontWeight="600" textAlign="center" color="$brandText" letterSpacing={0.1}>
                 {t('dashboard.viewLeads')}
@@ -243,12 +250,24 @@ export default function DashboardScreen() {
           <XStack justifyContent="space-around" alignItems="center">
             <YStack alignItems="center" gap="$1">
               <Text fontSize={34} fontWeight="800" color="$brandPrimary" letterSpacing={-1}>
-                {usage.leadsStored}
+                {stats?.leadsGenerated ?? 0}
               </Text>
               <XStack alignItems="center" gap="$1">
-                <Ionicons name="trending-up" size={14} color="#0F766E" />
+                <Ionicons name="people" size={14} color="#0F766E" />
                 <Text fontSize={12} color="$brandTextLight">
-                  {t('dashboard.newLeads')}
+                  {t('dashboard.leadsThisMonth')}
+                </Text>
+              </XStack>
+            </YStack>
+            <YStack width={1} height={48} backgroundColor="$brandBorder" />
+            <YStack alignItems="center" gap="$1">
+              <Text fontSize={34} fontWeight="800" color="#16A34A" letterSpacing={-1}>
+                {stats?.bookings ?? 0}
+              </Text>
+              <XStack alignItems="center" gap="$1">
+                <Ionicons name="checkmark-circle" size={14} color="#16A34A" />
+                <Text fontSize={12} color="$brandTextLight">
+                  {t('dashboard.bookingsThisMonth')}
                 </Text>
               </XStack>
             </YStack>
@@ -258,7 +277,7 @@ export default function DashboardScreen() {
                 {usage.postsGenerated}
               </Text>
               <XStack alignItems="center" gap="$1">
-                <Ionicons name="calendar-outline" size={14} color="#6B7280" />
+                <Ionicons name="sparkles" size={14} color="#6B7280" />
                 <Text fontSize={12} color="$brandTextLight">
                   {t('dashboard.postsThisMonth')}
                 </Text>
