@@ -36,6 +36,8 @@ type ProfileFormData = {
   booking_url: string;
   slug: string;
   services_offered: string;
+  specialties?: string;
+  pricing_info?: string;
   target_customer: string;
   tone: string;
   default_language: string;
@@ -168,6 +170,8 @@ export default function ProfileSetupScreen() {
             .optional()
             .or(z.literal('')),
           services_offered: z.string().min(1, t('profile.validation.servicesRequired')),
+          specialties: z.string().optional(),
+          pricing_info: z.string().optional(),
           target_customer: z.string().min(1, t('profile.validation.targetCustomerRequired')),
           tone: z.string().min(1, t('profile.validation.toneRequired')),
           default_language: z.string().min(1),
@@ -210,6 +214,8 @@ export default function ProfileSetupScreen() {
       booking_url: isEditing ? (profile?.booking_url ?? '') : '',
       slug: isEditing ? (profile?.slug ?? '') : '',
       services_offered: isEditing ? (profile?.services_offered ?? '') : '',
+      specialties: isEditing ? (profile?.specialties ?? '') : '',
+      pricing_info: isEditing ? (profile?.pricing_info ?? '') : '',
       target_customer: isEditing ? (profile?.target_customer ?? '') : '',
       tone: isEditing ? (profile?.tone ?? '') : '',
       default_language: isEditing ? (profile?.default_language ?? 'es') : 'es',
@@ -569,6 +575,42 @@ export default function ProfileSetupScreen() {
 
                 <Controller
                   control={control}
+                  name="specialties"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <InputField
+                      label={t('profile.step1.specialtiesLabel')}
+                      placeholder={t('profile.step1.specialtiesPlaceholder')}
+                      multiline
+                      numberOfLines={2}
+                      textAlignVertical="top"
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                      onFocus={() => scrollToInput(150)}
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="pricing_info"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <InputField
+                      label={t('profile.step1.pricingLabel')}
+                      placeholder={t('profile.step1.pricingPlaceholder')}
+                      multiline
+                      numberOfLines={2}
+                      textAlignVertical="top"
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                      onFocus={() => scrollToInput(250)}
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
                   name="target_customer"
                   render={({ field: { onChange, onBlur, value } }) => (
                     <InputField
@@ -578,7 +620,7 @@ export default function ProfileSetupScreen() {
                       onBlur={onBlur}
                       value={value}
                       error={errors.target_customer?.message}
-                      onFocus={() => scrollToInput(200)}
+                      onFocus={() => scrollToInput(350)}
                     />
                   )}
                 />

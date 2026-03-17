@@ -77,6 +77,25 @@ export async function archivePost(postId: string) {
   return data as Post;
 }
 
+export type TopPost = {
+  generated_content: string;
+  platform: string | null;
+  click_count: number;
+};
+
+export async function getTopPosts(userId: string, limit = 3): Promise<TopPost[]> {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('generated_content, platform, click_count')
+    .eq('user_id', userId)
+    .is('archived_at', null)
+    .gt('click_count', 0)
+    .order('click_count', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []) as TopPost[];
+}
+
 export async function unarchivePost(postId: string) {
   const { data, error } = await supabase
     .from('posts')

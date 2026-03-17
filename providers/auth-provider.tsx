@@ -20,6 +20,8 @@ type Profile = {
   booking_type: string | null;
   booking_url: string | null;
   slug: string | null;
+  specialties: string | null;
+  pricing_info: string | null;
 };
 
 export type AuthContextType = {

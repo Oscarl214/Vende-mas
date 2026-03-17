@@ -166,6 +166,10 @@
       "subtitle": "Ayúdanos a generar el mejor contenido para tu negocio.",
       "servicesLabel": "Servicios ofrecidos *",
       "servicesPlaceholder": "Ej: Cortes de cabello, barba, fades, coloración...",
+      "specialtiesLabel": "¿Qué te hace especial? (opcional)",
+      "specialtiesPlaceholder": "Ej: 10 años de experiencia, negocio familiar, solo productos orgánicos, acepto sin cita",
+      "pricingLabel": "Información de precios (opcional)",
+      "pricingPlaceholder": "Ej: Cortes desde $15, paquetes desde $50, consultas gratis",
       "targetCustomerLabel": "Cliente objetivo *",
       "targetCustomerPlaceholder": "Ej: Hombres jóvenes de 18-35 años buscando estilos modernos",
       "toneLabel": "Tono de contenido *",
@@ -308,7 +312,11 @@
     "revenuePlaceholder": "Monto ganado",
     "revenueSaved": "Guardado",
     "saveRevenue": "Guardar",
-    "deleteLead": "Eliminar lead"
+    "deleteLead": "Eliminar lead",
+    "lastContacted": "Último contacto {{time}}",
+    "needsFollowUp": "Necesita seguimiento",
+    "messageHistory": "Historial de mensajes",
+    "noMessages": "Aún no se han enviado mensajes"
   },
   "settings": {
     "editBusiness": "Editar negocio",
@@ -462,7 +470,14 @@
     "saveEdit": "Guardar",
     "sharePost": "Compartir Post",
     "copyCaption": "Copiar Caption",
-    "shareTip": "La mayoría de las redes sociales no aceptan captions pegados. Copia el caption primero, luego abre la app y pégalo tú mismo."
+    "shareTip": "La mayoría de las redes sociales no aceptan captions pegados. Copia el caption primero, luego abre la app y pégalo tú mismo.",
+    "contextImageLabel": "Agrega una foto de contexto (opcional)",
+    "contextImagePlaceholder": "Agregar foto",
+    "contextImageAdded": "Foto agregada",
+    "contextImageHint": "La IA usará esta imagen para escribir un caption más específico.",
+    "photoPermissionDenied": "Se requiere permiso de la galería para agregar una foto de contexto.",
+    "testimonialLabel": "Pega una reseña real de un cliente",
+    "testimonialPlaceholder": "Ej: \"¡El mejor corte que me han dado! Definitivamente vuelvo.\""
   },
   "tiers": {
     "free": "Gratis",

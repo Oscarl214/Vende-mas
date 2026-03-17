@@ -8,6 +8,8 @@ type ProfileContext = {
   target_customer: string | null;
   tone: string | null;
   default_language: string | null;
+  specialties: string | null;
+  pricing_info: string | null;
 };
 
 type LeadContext = {
@@ -29,6 +31,10 @@ export async function generateContent(params: {
   platform: string;
   promotionDetails?: string;
   maxLength?: string;
+  contextImageBase64?: string;
+  testimonialText?: string;
+  topPosts?: Array<{ content: string; clicks: number; platform: string | null }>;
+  currentDate?: string;
   profile: ProfileContext;
   bookingUrl?: string | null;
 }): Promise<{ caption: string; postStrength?: PostStrength }> {

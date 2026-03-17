@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Alert,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -9,6 +10,7 @@ import {
   Share,
   TextInput,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { YStack, Text, XStack, Sheet } from 'tamagui';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +27,7 @@ import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
 import { generateContent, type PostStrength } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
-import { createPost } from '@/lib/posts';
+import { createPost, getTopPosts } from '@/lib/posts';
 import { markOnboardingSeen, markMilestone } from '@/lib/onboarding';
 
 const GOAL_KEYS = [
@@ -86,6 +88,10 @@ export default function GeneratePostScreen() {
     { key: 'long', label: t('contentEngine.lengthLong') },
   ] as const;
 
+  const [contextImageUri, setContextImageUri] = useState<string | null>(null);
+  const [contextImageBase64, setContextImageBase64] = useState<string | null>(null);
+  const [testimonialText, setTestimonialText] = useState('');
+
   const [generatedCaption, setGeneratedCaption] = useState('');
   const [postStrength, setPostStrength] = useState<PostStrength | null>(null);
   const [savedPostId, setSavedPostId] = useState<string | null>(null);
@@ -125,11 +131,26 @@ export default function GeneratePostScreen() {
     setEditing(false);
 
     try {
+      // Fetch top posts for AI context — silently skip if unavailable
+      let topPosts: Array<{ content: string; clicks: number; platform: string | null }> = [];
+      if (user) {
+        try {
+          const posts = await getTopPosts(user.id);
+          topPosts = posts.map((p) => ({ content: p.generated_content, clicks: p.click_count, platform: p.platform }));
+        } catch {
+          // optional — don't block generation
+        }
+      }
+
       const result = await generateContent({
         contentGoal: goal,
         platform,
         promotionDetails: promotionDetails || undefined,
         maxLength: maxLength !== 'auto' ? maxLength : undefined,
+        contextImageBase64: contextImageBase64 ?? undefined,
+        testimonialText: goal === 'testimonial' ? (testimonialText || undefined) : undefined,
+        topPosts: topPosts.length > 0 ? topPosts : undefined,
+        currentDate: new Date().toISOString(),
         profile: {
           business_name: profile?.business_name ?? null,
           business_type: profile?.business_type ?? null,
@@ -138,6 +159,8 @@ export default function GeneratePostScreen() {
           target_customer: profile?.target_customer ?? null,
           tone: profile?.tone ?? null,
           default_language: profile?.default_language ?? null,
+          specialties: profile?.specialties ?? null,
+          pricing_info: profile?.pricing_info ?? null,
         },
         bookingUrl: user ? getEffectiveBookingUrl(profile ?? null, user.id) : null,
       });
@@ -203,6 +226,24 @@ export default function GeneratePostScreen() {
     setSuccessSheetOpen(false);
     await markOnboardingSeen();
     router.replace('/(app)/(tabs)');
+  };
+
+  const handlePickContextImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert(t('common.error'), t('contentEngine.photoPermissionDenied'));
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.7,
+      base64: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setContextImageUri(result.assets[0].uri);
+      setContextImageBase64(result.assets[0].base64 ?? null);
+    }
   };
 
   return (
@@ -304,6 +345,22 @@ export default function GeneratePostScreen() {
                   </Sheet>
                 </YStack>
 
+                {/* Testimonial input — shown only when goal is testimonial */}
+                {goal === 'testimonial' && (
+                  <InputField
+                    label={t('contentEngine.testimonialLabel')}
+                    placeholder={t('contentEngine.testimonialPlaceholder')}
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                    onChangeText={setTestimonialText}
+                    value={testimonialText}
+                    returnKeyType="done"
+                    blurOnSubmit
+                    onSubmitEditing={() => Keyboard.dismiss()}
+                  />
+                )}
+
                 {/* Platform Selector */}
                 <YStack gap="$1.5">
                   <Text fontSize={14} fontWeight="500" color="$brandText">
@@ -376,6 +433,69 @@ export default function GeneratePostScreen() {
                     />
                   )}
                 </XStack>
+
+                {/* Context Image */}
+                <YStack gap="$1.5">
+                  <Text fontSize={14} fontWeight="500" color="$brandText">
+                    {t('contentEngine.contextImageLabel')}
+                  </Text>
+                  {contextImageUri ? (
+                    <XStack alignItems="flex-start" gap="$3">
+                      <XStack style={{ position: 'relative' }}>
+                        <Image
+                          source={{ uri: contextImageUri }}
+                          style={{ width: 90, height: 90, borderRadius: 10 }}
+                          resizeMode="cover"
+                        />
+                        <Pressable
+                          onPress={() => {
+                            setContextImageUri(null);
+                            setContextImageBase64(null);
+                          }}
+                          style={{
+                            position: 'absolute',
+                            top: -8,
+                            right: -8,
+                            backgroundColor: '#EF4444',
+                            borderRadius: 12,
+                            width: 24,
+                            height: 24,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <Ionicons name="close" size={14} color="#fff" />
+                        </Pressable>
+                      </XStack>
+                      <YStack flex={1} justifyContent="center" gap="$1">
+                        <Text fontSize={13} fontWeight="500" color="$brandText">
+                          {t('contentEngine.contextImageAdded')}
+                        </Text>
+                        <Text fontSize={12} color="$brandTextLight" lineHeight={17}>
+                          {t('contentEngine.contextImageHint')}
+                        </Text>
+                      </YStack>
+                    </XStack>
+                  ) : (
+                    <Pressable onPress={handlePickContextImage}>
+                      <XStack
+                        borderRadius={12}
+                        borderWidth={1.5}
+                        borderColor="$brandBorder"
+                        height={72}
+                        alignItems="center"
+                        justifyContent="center"
+                        gap="$2"
+                        backgroundColor="$brandBackground"
+                      >
+                        <Ionicons name="image-outline" size={20} color="#9CA3AF" />
+                        <Text fontSize={14} color="$brandTextLight">
+                          {t('contentEngine.contextImagePlaceholder')}
+                        </Text>
+                      </XStack>
+                    </Pressable>
+                  )}
+                </YStack>
 
                 {/* Length selector */}
                 <YStack gap="$1.5">

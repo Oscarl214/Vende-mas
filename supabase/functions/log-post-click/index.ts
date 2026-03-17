@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
 
     const { data: post, error: fetchError } = await supabase
       .from("posts")
-      .select("id, user_id, click_count")
+      .select("id, user_id, click_count, platform")
       .eq("id", postId)
       .single();
 
@@ -61,6 +61,39 @@ Deno.serve(async (req) => {
     if (updateError) {
       return json({ error: updateError.message }, 500);
     }
+
+    // Push notification — fire and forget, don't block the response
+    (async () => {
+      try {
+        const { data: tokens } = await supabase
+          .from("push_tokens")
+          .select("token")
+          .eq("user_id", userId);
+
+        if (tokens && tokens.length > 0) {
+          const platform = (post as { platform?: string }).platform ?? "social";
+          const platformLabel = platform.replace("_", " ");
+          const totalClicks = currentCount + 1;
+          const messages = tokens.map((row: { token: string }) => ({
+            to: row.token,
+            sound: "default",
+            title: "📈 Post click!",
+            body: totalClicks === 1
+              ? `Someone clicked your ${platformLabel} post — they might reach out!`
+              : `Your ${platformLabel} post now has ${totalClicks} clicks!`,
+            data: { type: "post_click", postId },
+          }));
+
+          await fetch("https://exp.host/--/api/v2/push/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(messages),
+          });
+        }
+      } catch {
+        // Push failure must never affect click tracking
+      }
+    })();
 
     return json({ success: true });
   } catch (err) {

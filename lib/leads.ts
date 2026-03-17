@@ -111,6 +111,43 @@ export async function updateLeadRevenue(leadId: string, revenue: number | null) 
   return data as Lead;
 }
 
+export type LeadMessage = {
+  id: string;
+  lead_id: string;
+  user_id: string;
+  message: string;
+  channel: 'sms' | 'whatsapp' | 'email';
+  sent_at: string;
+};
+
+export async function logLeadMessage(
+  leadId: string,
+  userId: string,
+  message: string,
+  channel: LeadMessage['channel'],
+): Promise<LeadMessage> {
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from('lead_messages')
+    .insert({ lead_id: leadId, user_id: userId, message, channel, sent_at: now })
+    .select()
+    .single();
+  if (error) throw error;
+  // Keep last_contacted_at current whenever a message is logged
+  await supabase.from('leads').update({ last_contacted_at: now }).eq('id', leadId);
+  return data as LeadMessage;
+}
+
+export async function getLeadMessages(leadId: string): Promise<LeadMessage[]> {
+  const { data, error } = await supabase
+    .from('lead_messages')
+    .select('*')
+    .eq('lead_id', leadId)
+    .order('sent_at', { ascending: false });
+  if (error) throw error;
+  return data as LeadMessage[];
+}
+
 export async function deleteLead(leadId: string) {
   const { data: lead, error: fetchError } = await supabase
     .from('leads')

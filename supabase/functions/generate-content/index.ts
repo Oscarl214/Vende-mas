@@ -56,7 +56,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { contentGoal, platform, promotionDetails, maxLength, profile, bookingUrl } =
+    const { contentGoal, platform, promotionDetails, maxLength, profile, bookingUrl, contextImageBase64, testimonialText, topPosts, currentDate } =
       await req.json();
 
     const constraints = PLATFORM_CONSTRAINTS[platform] ?? PLATFORM_CONSTRAINTS.facebook;
@@ -104,20 +104,51 @@ Respond with valid JSON only. No markdown fences, no extra text. Use this exact 
 
 The "caption" value is the post text you wrote.
 The "score" rates how effective this post is based on: (1) alignment with the content goal — does it clearly serve a ${contentGoal} post?, (2) platform fit — does it follow ${platform.replace("_", " ")} best practices?, (3) clarity and authenticity — does it sound like a real person?
-The "reason" must be written in ${lang}. It should be a short, encouraging insight explaining why the post works or one specific way to make it stronger.`;
+The "reason" must be written in ${lang}. It should be a short, encouraging insight explaining why the post works or one specific way to make it stronger.${contextImageBase64 ? `\n\nAn image has been provided for visual context. Study it carefully and reference specific visual details (colors, setting, product, atmosphere, people) to make the caption feel grounded and authentic. Don't describe the image — use it to write a better post.` : ""}`;
 
-    const userPrompt = `Your business: ${profile.business_name}
+    // Format current date for context
+    const dateContext = currentDate
+      ? (() => {
+          const d = new Date(currentDate);
+          const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+          const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+          return `${days[d.getDay()]}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+        })()
+      : null;
+
+    const userPromptText = `Your business: ${profile.business_name}
 What you do: ${profile.business_type}
 Where: ${profile.location}
 Services: ${profile.services_offered}
+${profile.specialties ? `What makes you special: ${profile.specialties}` : ""}
+${profile.pricing_info ? `Pricing: ${profile.pricing_info}` : ""}
 Who you're talking to: ${profile.target_customer}
+${dateContext ? `Today is: ${dateContext} — use this for timing hooks if relevant (weekend deals, weekday promos, seasonal angle, etc.)` : ""}
 
 Goal of this post: ${contentGoal}
 Platform: ${platform.replace("_", " ")}
 ${hasPromotion ? `What you're promoting: ${promotionDetails}` : ""}
+${contentGoal === "testimonial" && testimonialText ? `Real customer review to base this on: "${testimonialText}"` : ""}
 ${bookingUrl ? `Your booking link (work it in naturally): ${bookingUrl}` : ""}
-
+${topPosts && topPosts.length > 0 ? `
+Your best performing posts (study these — match their tone, hook style, and structure):
+${topPosts.map((p, i) => `${i + 1}. [${p.platform ?? "social"}, ${p.clicks} click${p.clicks !== 1 ? "s" : ""}] "${p.content.slice(0, 220)}"`).join("\n")}
+` : ""}
 Write the post.`;
+
+    const userMessageContent = contextImageBase64
+      ? [
+          {
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: "image/jpeg",
+              data: contextImageBase64,
+            },
+          },
+          { type: "text", text: userPromptText },
+        ]
+      : userPromptText;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -129,7 +160,7 @@ Write the post.`;
       body: JSON.stringify({
         model: "claude-sonnet-4-20250514",
         max_tokens: 1024,
-        messages: [{ role: "user", content: userPrompt }],
+        messages: [{ role: "user", content: userMessageContent }],
         system: systemPrompt,
       }),
     });

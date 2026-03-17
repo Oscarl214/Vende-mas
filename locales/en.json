@@ -166,6 +166,10 @@
       "subtitle": "Help us generate the best content for your business.",
       "servicesLabel": "Services offered *",
       "servicesPlaceholder": "E.g.: Haircuts, beard trims, fades, hair coloring...",
+      "specialtiesLabel": "What makes you special? (optional)",
+      "specialtiesPlaceholder": "E.g.: 10 years experience, family-owned, only organic products, walk-ins welcome",
+      "pricingLabel": "Pricing info (optional)",
+      "pricingPlaceholder": "E.g.: Haircuts from $15, packages start at $50, free consultations",
       "targetCustomerLabel": "Target customer *",
       "targetCustomerPlaceholder": "E.g.: Young men ages 18-35 looking for modern styles",
       "toneLabel": "Content tone *",
@@ -308,7 +312,11 @@
     "revenuePlaceholder": "Amount earned",
     "revenueSaved": "Saved",
     "saveRevenue": "Save",
-    "deleteLead": "Delete lead"
+    "deleteLead": "Delete lead",
+    "lastContacted": "Last contacted {{time}}",
+    "needsFollowUp": "Needs follow-up",
+    "messageHistory": "Message History",
+    "noMessages": "No messages sent yet"
   },
   "settings": {
     "editBusiness": "Edit business",
@@ -462,7 +470,14 @@
     "saveEdit": "Save",
     "sharePost": "Share Post",
     "copyCaption": "Copy Caption",
-    "shareTip": "Most social media platforms won't accept pasted captions. Copy the caption first, then open the app and paste it yourself."
+    "shareTip": "Most social media platforms won't accept pasted captions. Copy the caption first, then open the app and paste it yourself.",
+    "contextImageLabel": "Add a photo for context (optional)",
+    "contextImagePlaceholder": "Add photo",
+    "contextImageAdded": "Photo added",
+    "contextImageHint": "The AI will use this image to write a more specific caption.",
+    "photoPermissionDenied": "Photo library permission is required to add a context image.",
+    "testimonialLabel": "Paste a real customer review",
+    "testimonialPlaceholder": "E.g.: \"Best haircut I've ever had! Will definitely be back.\""
   },
   "tiers": {
     "free": "Free",

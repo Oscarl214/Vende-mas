@@ -13,7 +13,7 @@ import { InputField } from '@/components/ui/input';
 import { useSession } from '@/hooks/use-session';
 import { useSubscription } from '@/hooks/use-subscription';
 import { TIERS } from '@/constants/tiers';
-import { getLeads, updateLeadStatus, updateLeadRevenue, deleteLead, type Lead, type LeadStatus } from '@/lib/leads';
+import { getLeads, updateLeadStatus, updateLeadRevenue, deleteLead, logLeadMessage, getLeadMessages, leadNeedsFollowUp, daysSince, type Lead, type LeadStatus, type LeadMessage } from '@/lib/leads';
 import { getPost, type Post } from '@/lib/posts';
 import { generateFollowUp } from '@/lib/ai';
 import { getEffectiveBookingUrl } from '@/lib/booking';
@@ -47,6 +47,31 @@ const STATUS_ICONS: Record<LeadStatus, string> = {
   closed: 'checkmark-circle',
 };
 
+function timeAgo(dateStr: string, lang: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (lang === 'es') {
+    if (minutes < 1) return 'Ahora mismo';
+    if (minutes < 60) return `Hace ${minutes} min`;
+    if (hours < 24) return `Hace ${hours}h`;
+    if (days === 1) return 'Ayer';
+    return `Hace ${days} días`;
+  }
+  if (minutes < 1) return 'Just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days === 1) return 'Yesterday';
+  return `${days} days ago`;
+}
+
+const CHANNEL_META: Record<LeadMessage['channel'], { icon: string; color: string; label: string }> = {
+  sms: { icon: 'chatbubble-outline', color: '#0F766E', label: 'SMS' },
+  whatsapp: { icon: 'logo-whatsapp', color: '#25D366', label: 'WhatsApp' },
+  email: { icon: 'mail-outline', color: '#2563EB', label: 'Email' },
+};
+
 function formatDate(dateStr: string, lang: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString(lang === 'es' ? 'es-MX' : 'en-US', {
@@ -78,6 +103,7 @@ export default function LeadDetailScreen() {
   const [copied, setCopied] = useState(false);
   const [revenueInput, setRevenueInput] = useState('');
   const [savingRevenue, setSavingRevenue] = useState(false);
+  const [messages, setMessages] = useState<LeadMessage[]>([]);
   const pendingContactPrompt = useRef(false);
 
   const fetchLead = useCallback(async () => {
@@ -99,6 +125,20 @@ export default function LeadDetailScreen() {
   useEffect(() => {
     fetchLead();
   }, [fetchLead]);
+
+  const fetchMessages = useCallback(async () => {
+    if (!leadId) return;
+    try {
+      const msgs = await getLeadMessages(leadId);
+      setMessages(msgs);
+    } catch {
+      // silently fail
+    }
+  }, [leadId]);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
 
   useEffect(() => {
     if (!lead?.source_post_id) {
@@ -194,12 +234,25 @@ export default function LeadDetailScreen() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const logAndRefresh = async (channel: LeadMessage['channel']) => {
+    if (!lead || !user || !followUpMessage.trim()) return;
+    try {
+      await logLeadMessage(lead.id, user.id, followUpMessage, channel);
+      const now = new Date().toISOString();
+      setLead((prev) => prev ? { ...prev, last_contacted_at: now } : prev);
+      await fetchMessages();
+    } catch {
+      // silently fail — don't block the user
+    }
+  };
+
   const handleWhatsApp = () => {
     if (!lead?.phone) return;
     const phone = lead.phone.replace(/[^0-9+]/g, '');
     const encoded = encodeURIComponent(followUpMessage);
     pendingContactPrompt.current = true;
     Linking.openURL(`https://wa.me/${phone}?text=${encoded}`);
+    logAndRefresh('whatsapp');
   };
 
   const handleSMS = () => {
@@ -207,6 +260,7 @@ export default function LeadDetailScreen() {
     const encoded = encodeURIComponent(followUpMessage);
     pendingContactPrompt.current = true;
     Linking.openURL(`sms:${lead.phone}?body=${encoded}`);
+    logAndRefresh('sms');
   };
 
   const handleEmail = async () => {
@@ -218,6 +272,7 @@ export default function LeadDetailScreen() {
       await Linking.openURL(
         `mailto:${lead.email}?subject=${subject}&body=${body}`,
       );
+      logAndRefresh('email');
     } catch {
       pendingContactPrompt.current = false;
       Alert.alert(
@@ -324,6 +379,29 @@ export default function LeadDetailScreen() {
                   {t(`leads.status${lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}`)}
                 </Text>
               </XStack>
+              {leadNeedsFollowUp(lead) ? (
+                <XStack
+                  alignItems="center"
+                  gap="$1"
+                  backgroundColor="#FEF3C7"
+                  borderRadius={6}
+                  paddingHorizontal="$1.5"
+                  paddingVertical={2}
+                  alignSelf="flex-start"
+                >
+                  <Ionicons name="alert-circle-outline" size={12} color="#D97706" />
+                  <Text fontSize={11} fontWeight="600" color="#D97706">
+                    {t('leadDetail.needsFollowUp')}
+                  </Text>
+                </XStack>
+              ) : lead.last_contacted_at ? (
+                <XStack alignItems="center" gap="$1">
+                  <Ionicons name="checkmark-circle-outline" size={12} color="#6B7280" />
+                  <Text fontSize={12} color="$brandTextLight">
+                    {t('leadDetail.lastContacted', { time: timeAgo(lead.last_contacted_at, profile?.default_language ?? 'en') })}
+                  </Text>
+                </XStack>
+              ) : null}
               {lead.revenue != null && (
                 <XStack alignItems="center" gap="$1">
                   <Ionicons name="cash-outline" size={13} color="#16A34A" />
@@ -372,21 +450,46 @@ export default function LeadDetailScreen() {
           </XStack>
 
           {sourcePost && (
-            <XStack alignItems="center" gap="$2.5" paddingVertical="$1">
-              <Ionicons
-                name={(PLATFORM_ICONS[sourcePost.platform ?? ''] ?? 'document-text') as any}
-                size={18}
-                color="#6B7280"
-              />
-              <YStack flex={1} minWidth={0}>
-                <Text fontSize={12} color="$brandTextLight">
+            <YStack
+              borderLeftWidth={3}
+              borderLeftColor="$brandPrimary"
+              paddingLeft="$3"
+              paddingVertical="$2"
+              gap="$1"
+              backgroundColor="$brandBackground"
+              borderRadius={8}
+              marginTop="$1"
+            >
+              <XStack alignItems="center" gap="$1.5">
+                <Ionicons
+                  name={(PLATFORM_ICONS[sourcePost.platform ?? ''] ?? 'document-text') as any}
+                  size={13}
+                  color={brand.primary}
+                />
+                <Text fontSize={11} fontWeight="700" color="$brandPrimary" style={{ textTransform: 'uppercase', letterSpacing: 0.5 }}>
                   {t('leadDetail.fromPost')}
                 </Text>
-                <Text fontSize={14} color="$brandText" numberOfLines={2}>
-                  {truncateCaption(sourcePost.generated_content, 56)}
-                </Text>
-              </YStack>
-            </XStack>
+                {sourcePost.click_count > 0 && (
+                  <XStack
+                    marginLeft="auto"
+                    alignItems="center"
+                    gap="$1"
+                    backgroundColor="$brandPrimaryLight"
+                    borderRadius={6}
+                    paddingHorizontal="$1.5"
+                    paddingVertical={1}
+                  >
+                    <Ionicons name="cursor-outline" size={11} color={brand.primary} />
+                    <Text fontSize={11} fontWeight="600" color="$brandPrimary">
+                      {sourcePost.click_count}
+                    </Text>
+                  </XStack>
+                )}
+              </XStack>
+              <Text fontSize={13} color="$brandText" lineHeight={18} numberOfLines={3}>
+                {truncateCaption(sourcePost.generated_content, 120)}
+              </Text>
+            </YStack>
           )}
         </Card>
 
@@ -686,6 +789,83 @@ export default function LeadDetailScreen() {
               )}
             </YStack>
           )}
+        </YStack>
+
+        {/* Message History */}
+        <YStack gap="$3" marginTop="$2">
+          <XStack alignItems="center" gap="$2">
+            <Ionicons name="chatbubbles-outline" size={18} color={brand.primary} />
+            <Text fontSize={15} fontWeight="600" color="$brandSecondary">
+              {t('leadDetail.messageHistory')}
+            </Text>
+            {messages.length > 0 && (
+              <XStack
+                backgroundColor="$brandPrimaryLight"
+                borderRadius={10}
+                paddingHorizontal="$1.5"
+                paddingVertical={1}
+                minWidth={20}
+                alignItems="center"
+                justifyContent="center"
+              >
+                <Text fontSize={11} fontWeight="700" color="$brandTextInverse">
+                  {messages.length}
+                </Text>
+              </XStack>
+            )}
+          </XStack>
+
+          <Card variant="elevated" gap="$0">
+            {messages.length === 0 ? (
+              <XStack alignItems="center" gap="$2" padding="$4" justifyContent="center">
+                <Ionicons name="chatbubble-ellipses-outline" size={18} color="#9CA3AF" />
+                <Text fontSize={14} color="$brandTextLight">
+                  {t('leadDetail.noMessages')}
+                </Text>
+              </XStack>
+            ) : (
+              messages.map((msg, index) => {
+                const meta = CHANNEL_META[msg.channel];
+                const lang = profile?.default_language ?? 'en';
+                return (
+                  <YStack
+                    key={msg.id}
+                    paddingVertical="$3"
+                    paddingHorizontal="$3.5"
+                    borderBottomWidth={index < messages.length - 1 ? 1 : 0}
+                    borderColor="$brandBorder"
+                  >
+                    <XStack alignItems="flex-start" gap="$2.5">
+                      <XStack
+                        width={32}
+                        height={32}
+                        borderRadius={16}
+                        backgroundColor="$brandBackground"
+                        alignItems="center"
+                        justifyContent="center"
+                        flexShrink={0}
+                      >
+                        <Ionicons name={meta.icon as any} size={16} color={meta.color} />
+                      </XStack>
+                      <YStack flex={1} gap="$0.5">
+                        <XStack justifyContent="space-between" alignItems="center">
+                          <Text fontSize={12} fontWeight="600" color={meta.color}>
+                            {meta.label}
+                          </Text>
+                          <Text fontSize={11} color="$brandTextLight">
+                            {timeAgo(msg.sent_at, lang)}
+                          </Text>
+                        </XStack>
+                        <Text fontSize={14} color="$brandText" lineHeight={20} numberOfLines={4}>
+                          {msg.message}
+                        </Text>
+                      </YStack>
+                    </XStack>
+                  </YStack>
+                );
+              })
+            )}
+          </Card>
         </YStack>
 
         {/* Delete lead */}
