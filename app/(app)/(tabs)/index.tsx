@@ -112,6 +112,48 @@ export default function DashboardScreen() {
           </XStack>
         </XStack>
 
+        {usage.postsGenerated === 0 && (
+          <Pressable onPress={() => router.push('/(app)/generate-post')}>
+            <YStack
+              borderRadius={16}
+              backgroundColor={brand.primary}
+              padding="$4"
+              gap="$2"
+              style={{
+                shadowColor: brand.primary,
+                shadowOpacity: 0.3,
+                shadowRadius: 16,
+                shadowOffset: { width: 0, height: 6 },
+              }}
+            >
+              <XStack alignItems="center" gap="$2">
+                <Ionicons name="sparkles" size={18} color={brand.onPrimary} />
+                <Text fontSize={15} fontWeight="800" color={brand.onPrimary} letterSpacing={-0.3}>
+                  {t('dashboard.firstPostHeroTitle')}
+                </Text>
+              </XStack>
+              <Text fontSize={13} color={brand.onPrimary} opacity={0.85} lineHeight={19}>
+                {t('dashboard.firstPostHeroSub')}
+              </Text>
+              <XStack
+                alignSelf="flex-start"
+                marginTop="$1"
+                backgroundColor="rgba(255,255,255,0.2)"
+                paddingHorizontal="$3"
+                paddingVertical="$1.5"
+                borderRadius={20}
+                alignItems="center"
+                gap="$1.5"
+              >
+                <Text fontSize={13} fontWeight="700" color={brand.onPrimary}>
+                  {t('dashboard.firstPostHeroCta')}
+                </Text>
+                <Ionicons name="arrow-forward" size={13} color={brand.onPrimary} />
+              </XStack>
+            </YStack>
+          </Pressable>
+        )}
+
         {showChecklist && (
           <Card variant="outlined" gap="$3">
             <Text fontSize={11} fontWeight="700" color="$brandTextLight" letterSpacing={1.0} textTransform="uppercase">

@@ -87,13 +87,13 @@ export default function WelcomeScreen() {
               key={labelKey}
               alignItems="center"
               gap="$1.5"
-              backgroundColor={brand.primarySoftBg}
+              backgroundColor={brand.primary}
               paddingHorizontal="$3"
               paddingVertical="$2"
               borderRadius={20}
             >
-              <Ionicons name={icon} size={13} color={brand.primaryDark} />
-              <Text fontSize={12} fontWeight="600" color={brand.primary}>
+              <Ionicons name={icon} size={13} color="#FFFFFF" />
+              <Text fontSize={12} fontWeight="600" color="#FFFFFF">
                 {t(labelKey)}
               </Text>
             </XStack>
